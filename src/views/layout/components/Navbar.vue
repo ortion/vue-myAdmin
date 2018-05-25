@@ -1,35 +1,19 @@
 <template>
   <el-menu class="navbar" mode="horizontal">
-    <hamburger class="hamburger-container" :toggleClick="toggleSideBar" :isActive="sidebar.opened"></hamburger>
+    <div class="hamburger-container" @click="toggleSideBar">
+      <svg-icon icon-class="toggle" class="hamburger" :class="{'is-active':sidebar.opened}"></svg-icon>
+    </div>
     <breadcrumb></breadcrumb>
-    <el-dropdown class="avatar-container" trigger="click">
-      <div class="avatar-wrapper">
-        <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
-        <i class="el-icon-caret-bottom"></i>
-      </div>
-      <el-dropdown-menu class="user-dropdown" slot="dropdown">
-        <router-link class="inlineBlock" to="/">
-          <el-dropdown-item>
-            Home
-          </el-dropdown-item>
-        </router-link>
-        <el-dropdown-item divided>
-          <span @click="logout" style="display:block;">LogOut</span>
-        </el-dropdown-item>
-      </el-dropdown-menu>
-    </el-dropdown>
+
   </el-menu>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-
 export default {
   components: {
-    Breadcrumb,
-    Hamburger
+    Breadcrumb
   },
   computed: {
     ...mapGetters([
@@ -52,42 +36,37 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .navbar {
+  position: fixed;
+  top: 50px;
   height: 50px;
   line-height: 50px;
+  width: 100%;
   border-radius: 0px !important;
+  z-index: 2;
   .hamburger-container {
     line-height: 58px;
     height: 50px;
     float: left;
     padding: 0 10px;
+    margin-left: 10px;
+    .hamburger {
+      display: inline-block;
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      transform: rotate(180deg);
+      transition: 0.38s;
+      transform-origin: 50% 50%;
+    }
+    .hamburger.is-active {
+      transform: rotate(0deg);
+    }
   }
   .screenfull {
     position: absolute;
     right: 90px;
     top: 16px;
     color: red;
-  }
-  .avatar-container {
-    height: 50px;
-    display: inline-block;
-    position: absolute;
-    right: 35px;
-    .avatar-wrapper {
-      cursor: pointer;
-      margin-top: 5px;
-      position: relative;
-      .user-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-      }
-      .el-icon-caret-bottom {
-        position: absolute;
-        right: -20px;
-        top: 25px;
-        font-size: 12px;
-      }
-    }
   }
 }
 </style>

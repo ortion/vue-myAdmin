@@ -23,56 +23,65 @@ import Layout from '../views/layout/Layout'
 **/
 export const constantRouterMap = [
   { path: '/login', component: () => import('@/views/login/index'), hidden: true },
-  { path: '/404', component: () => import('@/views/404'), hidden: true },
-
+  { path: '/404', component: () => import('@/views/errorPage/404'), hidden: true },
   {
-    path: '/',
+    path: '',
     component: Layout,
-    redirect: '/dashboard',
-    name: 'Dashboard',
-    hidden: true,
+    redirect: '/home',
     children: [{
-      path: 'dashboard',
-      component: () => import('@/views/dashboard/index')
+      path: 'home',
+      name: 'home',
+      component: () => import('@/views/home/index'),
+      meta: { title: '首页', icon: 'home', index: '1', noCache: true }
     }]
   },
-
+  {
+    path: '/system',
+    component: Layout,
+    name: 'System',
+    alwaysShow: true,
+    meta: { title: '系统', icon: 'system', index: '8' },
+    children: [
+      {
+        path: 'systemList',
+        name: 'systemList',
+        component: () => import('@/views/system/systemList'),
+        meta: { title: '权限管理', index: '8-5' }
+      },
+      {
+        path: 'systemAdd',
+        name: 'systemAdd',
+        hidden: true,
+        component: () => import('@/views/system/systemAdd'),
+        meta: { title: '权限管理', index: '8-5-1' }
+      }
+    ]
+  },
   {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
     name: 'Example',
-    meta: { title: 'Example', icon: 'example' },
+
+    meta: { title: 'Example', icon: 'example', index: '2' },
     children: [
       {
         path: 'table',
         name: 'Table',
+
         component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table' }
+        meta: { title: 'Table', icon: 'table', index: '2-1' }
       },
       {
         path: 'tree',
         name: 'Tree',
+
         component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree' }
+        meta: { title: 'Tree', icon: 'tree', index: '2-2' }
       }
     ]
-  },
-
-  {
-    path: '/form',
-    component: Layout,
-    children: [
-      {
-        path: 'index',
-        name: 'Form',
-        component: () => import('@/views/form/index'),
-        meta: { title: 'Form', icon: 'form' }
-      }
-    ]
-  },
-
-  { path: '*', redirect: '/404', hidden: true }
+  }
+  // { path: '*', redirect: '/404', hidden: true }
 ]
 
 export default new Router({
@@ -80,4 +89,5 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
-
+export const asyncRouterMap = [
+]
