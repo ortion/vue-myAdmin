@@ -1,68 +1,51 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item">
-      </el-input>
-      <!-- <el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" >
-        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item">
-        </el-option>
-      </el-select> -->
-      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
+      <h3>权限管理</h3>
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
     </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
-      <el-table-column align="center" label='ID' width="95">
+      <el-table-column align="center" label='序号'>
         <template slot-scope="scope">
-          {{scope.$index}}
+          {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column label="Title">
+      <el-table-column label="角色" align="center">
         <template slot-scope="scope">
-          {{scope.row.title}}
+          {{scope.row.roleName}}
         </template>
       </el-table-column>
-      <el-table-column label="Author" width="110" align="center">
+      <el-table-column label="所属机构" align="center">
         <template slot-scope="scope">
-          <span>{{scope.row.author}}</span>
+          <span>{{scope.row.merchantTypeName}}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Pageviews" width="110" align="center">
+      <el-table-column align="center" label="操作">
         <template slot-scope="scope">
-          {{scope.row.pageviews}}
-        </template>
-      </el-table-column>
-      <el-table-column class-name="status-col" label="Status" width="110" align="center">
-        <template slot-scope="scope">
-          <el-tag :type="scope.row.status | statusFilter">{{scope.row.status}}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column align="center" prop="created_at" label="Display_time" width="200">
-        <template slot-scope="scope">
-          <i class="el-icon-time"></i>
-          <span>{{scope.row.display_time}}</span>
+          <div style="text-align:left">
+            <el-button size="mini" type="success" plain @click="handleModifyStatus(scope.row,'published')">分配</el-button>
+            <el-button v-if="scope.row.roleId!==superRoleId" type="primary" size="mini" plain @click="handleUpdate(scope.row)">修改</el-button>
+            <el-button v-if="scope.row.roleId!==superRoleId" size="mini" type="danger" plain @click="deleteRoles(scope.row)">删除</el-button>
+          </div>
         </template>
       </el-table-column>
     </el-table>
   </div>
 </template>
 <script>
-import { getList } from '@/api/table'
+import { mapGetters } from 'vuex'
+import { getRoleList, deleteRoles } from '@/api/rolesManage'
 export default {
   name: 'rolesList',
+  computed: {
+    ...mapGetters([
+      'superRoleId'
+    ])
+  },
   data() {
     return {
       list: null,
       listLoading: true
-    }
-  },
-  filters: {
-    statusFilter(status) {
-      const statusMap = {
-        published: 'success',
-        draft: 'gray',
-        deleted: 'danger'
-      }
-      return statusMap[status]
     }
   },
   created() {
@@ -71,13 +54,33 @@ export default {
   methods: {
     fetchData() {
       this.listLoading = true
-      getList(this.listQuery).then(response => {
-        this.list = response.data.items
+      getRoleList().then(response => {
+        this.list = response.data
         this.listLoading = false
       })
     },
     handleCreate() {
-      this.$router.push({ path: '/system/rolesManage/rolesAdd' })
+      this.$router.push({ name: 'rolesAdd', query: { isCreate: true }})
+    },
+    handleUpdate(row) {
+      this.$router.push({ name: 'rolesAdd', query: { roleId: row.roleId, isCreate: false }})
+    },
+    deleteRoles(row) {
+      console.log(row)
+      this.$confirm('是否确定删除角色:' + row.roleName, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRoles(row.roleId).then(res => {
+          this.fetchData()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        })
+      }).catch(() => {
+      })
     }
   }
 }

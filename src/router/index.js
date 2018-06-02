@@ -43,7 +43,7 @@ export const constantRouterMap = [
       path: 'rolesManage/rolesAdd',
       name: 'rolesAdd',
       component: () => import('@/views/system/rolesManage/rolesAdd'),
-      meta: { title: '角色添加' }
+      meta: { title: '权限管理' }
     }]
 
   }
