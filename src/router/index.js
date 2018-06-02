@@ -32,9 +32,30 @@ export const constantRouterMap = [
       path: 'home',
       name: 'home',
       component: () => import('@/views/home/index'),
-      meta: { title: '首页', icon: 'home', index: '1', noCache: true }
+      meta: { title: '首页', icon: 'home', noCache: true }
     }]
   },
+  {
+    path: '/system',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'rolesManage/rolesAdd',
+      name: 'rolesAdd',
+      component: () => import('@/views/system/rolesManage/rolesAdd'),
+      meta: { title: '角色添加' }
+    }]
+
+  }
+
+]
+
+export default new Router({
+  // mode: 'history', //后端支持可开
+  scrollBehavior: () => ({ y: 0 }),
+  routes: constantRouterMap
+})
+export const asyncRouterMap = [
   {
     path: '/system',
     component: Layout,
@@ -42,19 +63,21 @@ export const constantRouterMap = [
     alwaysShow: true,
     meta: { title: '系统', icon: 'system', index: '8' },
     children: [
+      //  APP首页管理
       {
-        path: 'systemList',
-        name: 'systemList',
-        component: () => import('@/views/system/systemList'),
-        meta: { title: '权限管理', index: '8-5' }
+        path: 'APPindexManage',
+        name: 'APPindexManage',
+        component: () => import('@/views/system/APPindexManage/index'),
+        meta: { title: 'APP首页管理', index: '8-3' }
       },
       {
-        path: 'systemAdd',
-        name: 'systemAdd',
-        hidden: true,
-        component: () => import('@/views/system/systemAdd'),
-        meta: { title: '权限管理', index: '8-5-1' }
+        //  权限管理
+        path: 'rolesManage/rolesList',
+        name: 'rolesList',
+        component: () => import('@/views/system/rolesManage/rolesList'),
+        meta: { title: '权限管理', index: '8-5' }
       }
+
     ]
   },
   {
@@ -78,16 +101,15 @@ export const constantRouterMap = [
 
         component: () => import('@/views/tree/index'),
         meta: { title: 'Tree', icon: 'tree', index: '2-2' }
+      },
+      {
+        path: 'form',
+        name: 'Form',
+
+        component: () => import('@/views/form/index'),
+        meta: { title: 'form', icon: 'form', index: '2-3' }
       }
     ]
   }
   // { path: '*', redirect: '/404', hidden: true }
-]
-
-export default new Router({
-  // mode: 'history', //后端支持可开
-  scrollBehavior: () => ({ y: 0 }),
-  routes: constantRouterMap
-})
-export const asyncRouterMap = [
 ]

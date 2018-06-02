@@ -48,7 +48,7 @@
 <script>
 import { getList } from '@/api/table'
 export default {
-  name: 'systemList',
+  name: 'hotKeyword',
   data() {
     return {
       list: null,
@@ -77,13 +77,11 @@ export default {
       })
     },
     handleCreate() {
-      this.$router.push({ path: '/system/systemAdd' })
+      this.$router.push({ path: '/system/rolesManage/rolesAdd' })
     }
   }
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.systemList {
-}
 </style>

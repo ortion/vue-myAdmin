@@ -1,14 +1,16 @@
 <template>
   <div class="header-wrapper">
+
     <el-dropdown class="avatar-container" trigger="click">
-      <div class="avatar-wrapper">
+      <span>设置</span>
+      <!-- <div class="avatar-wrapper">
         <img class="user-avatar" :src="avatar+'?imageView2/1/w/80/h/80'">
         <i class="el-icon-caret-bottom"></i>
-      </div>
+      </div> -->
       <el-dropdown-menu class="user-dropdown" slot="dropdown">
         <router-link class="inlineBlock" to="/">
           <el-dropdown-item>
-            Home
+            <span @click="openUpateDialog">修改密码</span>
           </el-dropdown-item>
         </router-link>
         <el-dropdown-item divided>
@@ -24,15 +26,24 @@ export default {
   name: 'AppHeader',
   computed: {
     ...mapGetters([
-      'avatar'
     ])
   },
+  // data() {
+  //   return {
+  //     dialogUpdateForm: false
+
+  //   }
+  // },
   methods: {
     logout() {
       this.$store.dispatch('LogOut').then(() => {
         location.reload() // 为了重新实例化vue-router对象 避免bug
       })
+    },
+    openUpateDialog() {
+      this.$emit('changeStatus', true)
     }
+
   }
 }
 </script>
@@ -42,7 +53,7 @@ export default {
   position: fixed;
   top: 0;
   width: 100%;
-  z-index: 3;
+  z-index: 100;
   height: 50px;
   padding: 0 12px 0 0;
   background: #fff;

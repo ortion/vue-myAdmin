@@ -1,9 +1,17 @@
 const getters = {
   sidebar: state => state.app.sidebar,
   device: state => state.app.device,
+  // 用户信息
   token: state => state.user.token,
-  avatar: state => state.user.avatar,
-  name: state => state.user.name,
-  roles: state => state.user.roles
+  userName: state => state.user.userName,
+  realName: state => state.user.realName,
+  merchantName: state => state.user.merchantName,
+  thirdRole: state => state.user.thirdRole,
+  catalog: state => state.user.catalog,
+  authList: state => state.user.authList,
+  superRoleId: state => state.user.superRoleId,
+  // 权限
+  permission_routers: state => state.permission.routers,
+  addRouters: state => state.permission.addRouters
 }
 export default getters

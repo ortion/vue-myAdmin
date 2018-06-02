@@ -1,6 +1,15 @@
 <template>
   <div class="app-container">
-    
+    <div class="filter-container">
+      <el-input @keyup.enter.native="handleFilter" style="width: 200px;" class="filter-item">
+      </el-input>
+      <!-- <el-select clearable style="width: 90px" class="filter-item" v-model="listQuery.importance" >
+        <el-option v-for="item in importanceOptions" :key="item" :label="item" :value="item">
+        </el-option>
+      </el-select> -->
+      <el-button class="filter-item" type="primary" v-waves icon="el-icon-search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
+    </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column align="center" label='ID' width="95">
         <template slot-scope="scope">
@@ -36,11 +45,10 @@
     </el-table>
   </div>
 </template>
-
 <script>
 import { getList } from '@/api/table'
-
 export default {
+  name: 'rolesList',
   data() {
     return {
       list: null,
@@ -67,7 +75,13 @@ export default {
         this.list = response.data.items
         this.listLoading = false
       })
+    },
+    handleCreate() {
+      this.$router.push({ path: '/system/rolesManage/rolesAdd' })
     }
   }
 }
 </script>
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped lang="scss">
+</style>

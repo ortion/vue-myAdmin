@@ -13,15 +13,27 @@ export function login(userName, password) {
 
 export function getInfo(token) {
   return request({
-    url: '/user/info',
-    method: 'get',
-    params: { token }
+    url: 'user/getinfo',
+    method: 'post',
+    data: {
+      token
+    }
   })
 }
 
-export function logout() {
+export function logout(token) {
   return request({
-    url: '/user/logout',
-    method: 'post'
+    url: 'logout',
+    method: 'post',
+    data: {
+      token
+    }
+  })
+}
+export function updatePassword(data) {
+  return request({
+    url: 'basepassword',
+    method: 'post',
+    data
   })
 }

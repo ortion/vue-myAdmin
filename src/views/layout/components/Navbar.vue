@@ -17,8 +17,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'sidebar',
-      'avatar'
+      'sidebar'
+      // 'avatar'
     ])
   },
   methods: {
@@ -42,7 +42,7 @@ export default {
   line-height: 50px;
   width: 100%;
   border-radius: 0px !important;
-  z-index: 2;
+  z-index: 99;
   .hamburger-container {
     line-height: 58px;
     height: 50px;

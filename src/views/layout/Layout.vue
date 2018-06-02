@@ -1,36 +1,44 @@
 <template>
-  <el-container class="app-wrapper" :class="classObj">
-    <el-header style="padding:0;">
-      <app-header>header</app-header>
-    </el-header>
-    <el-container>
-      <el-aside style="width:0;">
-        <sidebar class="sidebar-container"></sidebar>
-      </el-aside>
-      <el-container>
-        <el-main class="main-container" style="padding:0;">
-          <navbar></navbar>
-          <app-main></app-main>
-        </el-main>
-        <el-footer style="padding:0;margin-left: 180px;">Footer</el-footer>
-      </el-container>
-    </el-container>
-  </el-container>
-  <!-- <div class="app-wrapper" :class="classObj">
-    <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"></div>
+  <div class="app-wrapper" :class="classObj">
+    <!-- <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"></div> -->
     <sidebar class="sidebar-container"></sidebar>
-    <app-header>header</app-header>
+    <app-header @changeStatus="changeStatus" :dialog-status="IsSHOWdialog">header</app-header>
     <div class="main-container">
-      <navbar></navbar>
-      <app-main></app-main>
+      <div style="min-height: 600px;">
+        <navbar></navbar>
+        <app-main></app-main>
+      </div>
+      <div class="app-footer">Footer</div>
+
+      <el-dialog title="修改密码" :visible.sync="IsSHOWdialog" :show-close="false">
+        <el-form :model="passForm" label-width="100px" :rules="passRules" ref="passForm">
+          <el-form-item label="旧密码" prop="oldPass">
+            <el-input type="password" v-model="passForm.oldPass" auto-complete="off" placeholder="请输入旧密码"></el-input>
+          </el-form-item>
+          <el-form-item label="新密码" prop="newPass">
+            <el-input type="password" v-model="passForm.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
+          </el-form-item>
+          <el-form-item label="确认密码" prop="checkPass">
+            <el-input type="password" v-model="passForm.checkPass" auto-complete="off" placeholder="请确认新密码"></el-input>
+          </el-form-item>
+
+          <el-form-item>
+            <el-button @click="cancelDialog">取消</el-button>
+            <el-button type="primary" @click.native.prevent="submitPassword">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
+
     </div>
-  </div> -->
+
+  </div>
 </template>
 
 <script>
 import { Navbar, Sidebar, AppMain, AppHeader } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
-
+import { updatePassword } from '@/api/login'
+import { getToken } from '@/utils/auth'
 export default {
   name: 'layout',
   components: {
@@ -39,14 +47,61 @@ export default {
     AppMain,
     AppHeader
   },
+  props: ['dialogStatus'],
   mixins: [ResizeMixin],
+  data() {
+    var validateNPass = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请输入密码'))
+      } else if (value.length < 6) {
+        callback(new Error('密码不能小于6位'))
+      } else {
+        if (this.passForm.checkPass !== '') {
+          this.$refs.passForm.validateField('checkPass')
+        }
+        callback()
+      }
+    }
+    var validateNPass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'))
+      } else if (value !== this.passForm.newPass) {
+        callback(new Error('两次输入密码不一致!'))
+      } else {
+        callback()
+      }
+    }
+    return {
+      IsSHOWdialog: false,
+      passForm: {
+        oldPass: '',
+        newPass: '',
+        checkPass: ''
+
+      },
+      passRules: {
+        oldPass: [
+          { message: '请输入旧密码', trigger: 'blur', required: true }
+        ],
+        newPass: [
+          { validator: validateNPass, trigger: 'blur', required: true }
+        ],
+
+        checkPass: [
+          { validator: validateNPass2, trigger: 'blur', required: true }
+        ]
+      },
+      loading: false
+    }
+  },
   computed: {
     sidebar() {
       return this.$store.state.app.sidebar
     },
-    device() {
-      return this.$store.state.app.device
-    },
+    // device() {
+    //   return this.$store.state.app.device
+    // },
+
     classObj() {
       return {
         hideSidebar: !this.sidebar.opened,
@@ -56,8 +111,43 @@ export default {
     }
   },
   methods: {
+    cancelDialog() {
+      this.IsSHOWdialog = false
+      this.UpdateInfo.oldPwd = ''
+      this.UpdateInfo.newPwd = ''
+      this.newPwdAgain = ''
+    },
+    changeStatus(boot) {
+      this.IsSHOWdialog = boot
+    },
     handleClickOutside() {
       this.$store.dispatch('CloseSideBar', { withoutAnimation: false })
+    },
+    submitPassword() {
+      this.$refs.passForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          var passInfo = {
+            token: getToken(),
+            password: this.passForm.oldPass,
+            newPassword: this.passForm.newPass
+          }
+          updatePassword(passInfo).then(() => {
+            this.loading = false
+            this.IsSHOWdialog = false
+            this.$store.dispatch('FedLogOut').then(() => {
+              this.$message({
+                message: '密码修改成功请重新登陆',
+                type: 'success'
+              })
+              this.$router.push('/')
+            })
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     }
   }
 }
@@ -65,12 +155,17 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 @import "src/styles/mixin.scss";
+html,
+body {
+  height: 100%;
+}
 .app-wrapper {
   @include clearfix;
   position: relative;
-  height: 100%;
+  // height: 100%;
   width: 100%;
 }
+
 .drawer-bg {
   background: #000;
   opacity: 0.3;
@@ -79,5 +174,10 @@ export default {
   height: 100%;
   position: absolute;
   z-index: 999;
+}
+
+.app-footer {
+  padding: 0;
+  margin-left: 180px;
 }
 </style>

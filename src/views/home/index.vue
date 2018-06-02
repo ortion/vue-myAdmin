@@ -1,7 +1,7 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name:{{name}}</div>
-    <div class="dashboard-text">roles:<span v-for='role in roles' :key='role'>{{role}}</span></div>
+    <div class="dashboard-text">name:{{userName}}</div>
+    <!-- <div class="dashboard-text">roles:<span v-for='role in roles' :key='role'>{{role}}</span></div> -->
   </div>
 </template>
 
@@ -12,9 +12,12 @@ export default {
   name: 'home',
   computed: {
     ...mapGetters([
-      'name',
-      'roles'
+      'userName'
+      // 'roles'
     ])
+  },
+  created() {
+    // console.log(this.authList)
   }
 }
 </script>

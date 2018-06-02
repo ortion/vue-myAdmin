@@ -1,26 +1,41 @@
-import { login, logout, getInfo } from '@/api/login'
-import { getToken, setToken, removeToken } from '@/utils/auth'
-
+import { logout, login, getInfo } from '@/api/login'
+import { setToken, getToken, removeToken } from '@/utils/auth'
 const user = {
   state: {
     token: getToken(),
-    name: '',
-    avatar: '',
-    roles: []
+    userName: '',
+    realName: '',
+    merchantName: '',
+    superRoleId: '',
+    authList: [],
+    catalog: {},
+    thirdRole: {}
   },
 
   mutations: {
     SET_TOKEN: (state, token) => {
       state.token = token
     },
-    SET_NAME: (state, name) => {
-      state.name = name
+    SET_UNAME: (state, userName) => {
+      state.userName = userName
     },
-    SET_AVATAR: (state, avatar) => {
-      state.avatar = avatar
+    SET_RNAME: (state, realName) => {
+      state.realName = realName
     },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
+    SET_MCNAME: (state, merchantName) => {
+      state.merchantName = merchantName
+    },
+    SET_ROLEID: (state, superRoleId) => {
+      state.superRoleId = superRoleId
+    },
+    SET_AUTHLIST: (state, authList) => {
+      state.authList = authList
+    },
+    SET_CATALOG: (state, catalog) => {
+      state.catalog = catalog
+    },
+    SET_THREEROLE: (state, thirdRole) => {
+      state.thirdRole = thirdRole
     }
   },
 
@@ -30,8 +45,6 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         login(username, userInfo.password).then(response => {
-          console.log(response)
-          resolve()
           const data = response.data
           setToken(data.token)
           commit('SET_TOKEN', data.token)
@@ -41,19 +54,17 @@ const user = {
         })
       })
     },
-
     // 获取用户信息
-    GetInfo({ commit, state }) {
+    GetUserInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo(state.token).then(response => {
           const data = response.data
-          if (data.roles && data.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', data.roles)
-          } else {
-            reject('getInfo: roles must be a non-null array !')
-          }
-          commit('SET_NAME', data.name)
-          commit('SET_AVATAR', data.avatar)
+          commit('SET_AUTHLIST', data.authList)
+          commit('SET_UNAME', data.userName)
+          commit('SET_RNAME', data.realName)
+          commit('SET_MCNAME', data.merchantName)
+          commit('SET_ROLEID', data.superRoleId)
+
           resolve(response)
         }).catch(error => {
           reject(error)
@@ -66,7 +77,6 @@ const user = {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
           removeToken()
           resolve()
         }).catch(error => {
