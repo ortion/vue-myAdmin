@@ -79,37 +79,37 @@ export const asyncRouterMap = [
       }
 
     ]
-  },
-  {
-    path: '/example',
-    component: Layout,
-    redirect: '/example/table',
-    name: 'Example',
-
-    meta: { title: 'Example', icon: 'example', index: '2' },
-    children: [
-      {
-        path: 'table',
-        name: 'Table',
-
-        component: () => import('@/views/table/index'),
-        meta: { title: 'Table', icon: 'table', index: '2-1' }
-      },
-      {
-        path: 'tree',
-        name: 'Tree',
-
-        component: () => import('@/views/tree/index'),
-        meta: { title: 'Tree', icon: 'tree', index: '2-2' }
-      },
-      {
-        path: 'form',
-        name: 'Form',
-
-        component: () => import('@/views/form/index'),
-        meta: { title: 'form', icon: 'form', index: '2-3' }
-      }
-    ]
   }
+  // {
+  //   path: '/example',
+  //   component: Layout,
+  //   redirect: '/example/table',
+  //   name: 'Example',
+
+  //   meta: { title: 'Example', icon: 'example', index: '2' },
+  //   children: [
+  //     {
+  //       path: 'table',
+  //       name: 'Table',
+
+  //       component: () => import('@/views/table/index'),
+  //       meta: { title: 'Table', icon: 'table', index: '2-1' }
+  //     },
+  //     {
+  //       path: 'tree',
+  //       name: 'Tree',
+
+  //       component: () => import('@/views/tree/index'),
+  //       meta: { title: 'Tree', icon: 'tree', index: '2-2' }
+  //     },
+  //     {
+  //       path: 'form',
+  //       name: 'Form',
+
+  //       component: () => import('@/views/form/index'),
+  //       meta: { title: 'form', icon: 'form', index: '2-3' }
+  //     }
+  //   ]
+  // }
   // { path: '*', redirect: '/404', hidden: true }
 ]
