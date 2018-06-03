@@ -6,33 +6,35 @@
       <div class="right">功能权限</div>
     </li>
     <li v-for="(item,index) in dataList" :key="item.id">
-      <div class="left">
-        <!-- <i :class="{'el-icon-caret-right':item.folded,'el-icon-caret-bottom':!item.folded}" v-cloak v-if="item.second" class="item-icon"></i> -->
-        <el-checkbox @click.native="handleOneCheckAll($event,item)" v-cloak v-model="item.isSelect"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
-        <!-- <span v-if="item.second" v-cloak>{{item.title}}</span> -->
-        <!-- <el-checkbox v-if="item.children" @change="checkSecondAll(item)" v-model="item.firstCheckAll">{{item.title}}</el-checkbox> -->
-      </div>
-      <div class="right" v-if="item.authSign=='1'">
-        <el-checkbox v-for="p in item.children[0].children" :label="p.id" :key="p.id" v-cloak v-model="p.isSelect">
-          {{isMapName(p.level,p.authSign)}}
-        </el-checkbox>
-      </div>
-      <div class="line"></div>
-      <ul v-show="item.children" class="second-ul" v-if="item.authSign!='1'">
-        <li class="h40" v-for="(second,cur) in item.children" :key="second.id">
-          <div class="left">
-            <el-checkbox v-model="second.checkAll" @change="handleCheckAllChange($event,item,second)" v-cloak>
-              {{isMapName(second.level,second.authSign)}}
-            </el-checkbox>
-          </div>
-          <div class="right">
-            <el-checkbox v-for="p in second.children" :label="p.id" :key="p.id" v-cloak v-model="p.isSelect">
-              {{isMapName(p.level,p.authSign)}}
-            </el-checkbox>
-          </div>
-          <div class="line"></div>
-        </li>
-      </ul>
+      <el-checkbox-group v-model="checkedID" @change="handleChange">
+        <div class="left">
+          <!-- <i :class="{'el-icon-caret-right':item.folded,'el-icon-caret-bottom':!item.folded}" v-cloak v-if="item.second" class="item-icon"></i> -->
+          <el-checkbox :label="item.authSign" v-cloak> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+          <!-- <span v-if="item.second" v-cloak>{{item.title}}</span> -->
+          <!-- <el-checkbox v-if="item.children" @change="checkSecondAll(item)" v-model="item.firstCheckAll">{{item.title}}</el-checkbox> -->
+        </div>
+        <div class="right" v-if="item.authSign=='1'">
+          <el-checkbox v-for="p in item.children[0].children" :label="p.authSign" :key="p.id" v-cloak>
+            {{isMapName(p.level,p.authSign)}}
+          </el-checkbox>
+        </div>
+        <div class="line"></div>
+        <ul v-show="item.children" class="second-ul" v-if="item.authSign!='1'">
+          <li class="h40" v-for="(second,cur) in item.children" :key="second.id">
+            <div class="left">
+              <el-checkbox :label="second.authSign" v-model="second.isSelect" v-cloak>
+                {{isMapName(second.level,second.authSign)}}
+              </el-checkbox>
+            </div>
+            <div class="right">
+              <el-checkbox v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
+                {{isMapName(p.level,p.authSign)}}
+              </el-checkbox>
+            </div>
+            <div class="line"></div>
+          </li>
+        </ul>
+      </el-checkbox-group>
     </li>
   </ul>
 
@@ -53,8 +55,32 @@ export default {
       checkedID: []
     }
   },
+  watch: {
+    dataList: function() {
+      this.dataList.map(firstitem => {
+        if (firstitem.isSelect) {
+          this.checkedID.push(firstitem.authSign)
+          firstitem.children.map(seconditem => {
+            if (seconditem.isSelect) {
+              this.checkedID.push(seconditem.authSign)
+              seconditem.children.map(thirditem => {
+                if (thirditem.isSelect) {
+                  this.checkedID.push(thirditem.authSign)
+                }
+              })
+            }
+          })
+        }
+      })
+    }
+  },
   methods: {
     isMapName,
+    handleChange(value) {
+      this.checkedID = value
+      this.$emit('checkedID', this.checkedID)
+      // console.log(value)
+    },
     // 切换下级是否展开
     toggleExpanded: function(trIndex) {
       const record = this.formatData[trIndex]

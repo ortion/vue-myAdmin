@@ -60,10 +60,10 @@ export default {
       })
     },
     handleCreate() {
-      this.$router.push({ name: 'rolesAdd', query: { isCreate: true }})
+      this.$router.push({ name: 'rolesAdd' })
     },
     handleUpdate(row) {
-      this.$router.push({ name: 'rolesAdd', query: { roleId: row.roleId, isCreate: false }})
+      this.$router.push({ name: 'rolesAdd', query: { roleId: row.roleId }})
     },
     deleteRoles(row) {
       console.log(row)

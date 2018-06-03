@@ -30,7 +30,7 @@ export function loadRoles() { // 角色增加时加载角色信息
 }
 export function loadRolesUpate(roleId) { // 角色修改时加载角色原信息
   return request({
-    url: 'role/add/load',
+    url: 'role/update/load',
     method: 'post',
     data: {
       'token': getToken(),
@@ -44,17 +44,22 @@ export function addRoles(data) {
     method: 'post',
     data: {
       'token': getToken(),
-      data
+      'roleName': data.roleName,
+      'merchantTypeId': data.merchant,
+      'authIds': data.checkedID
     }
   })
 }
-export function updateRoles(data) {
+export function updateRoles(roleId, data) {
   return request({
     url: 'role/update',
     method: 'post',
     data: {
       'token': getToken(),
-      data
+      'roleId': roleId,
+      'roleName': data.roleName,
+      'merchantTypeId': data.merchant,
+      'authIds': data.checkedID
     }
   })
 }

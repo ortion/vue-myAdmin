@@ -38,7 +38,6 @@
 import { Navbar, Sidebar, AppMain, AppHeader } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { updatePassword } from '@/api/login'
-import { getToken } from '@/utils/auth'
 export default {
   name: 'layout',
   components: {
@@ -127,12 +126,7 @@ export default {
       this.$refs.passForm.validate(valid => {
         if (valid) {
           this.loading = true
-          var passInfo = {
-            token: getToken(),
-            password: this.passForm.oldPass,
-            newPassword: this.passForm.newPass
-          }
-          updatePassword(passInfo).then(() => {
+          updatePassword(this.passForm).then(() => {
             this.loading = false
             this.IsSHOWdialog = false
             this.$store.dispatch('FedLogOut').then(() => {
@@ -140,7 +134,7 @@ export default {
                 message: '密码修改成功请重新登陆',
                 type: 'success'
               })
-              this.$router.push('/')
+              this.$router.push('/login')
             })
           })
         } else {

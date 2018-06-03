@@ -1,5 +1,5 @@
 import request from '@/utils/request'
-
+import { getToken } from '@/utils/auth'
 export function login(userName, password) {
   return request({
     url: 'login',
@@ -34,6 +34,10 @@ export function updatePassword(data) {
   return request({
     url: 'basepassword',
     method: 'post',
-    data
+    data: {
+      'token': getToken(),
+      'password': data.oldPass,
+      'newPassword': data.newPass
+    }
   })
 }
