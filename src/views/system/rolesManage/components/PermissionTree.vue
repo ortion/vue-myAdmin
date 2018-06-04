@@ -1,43 +1,54 @@
 <template>
-
-  <ul class="role-table">
-    <li class="header">
-      <div class="left">菜单列表 </div>
-      <div class="right">功能权限</div>
-    </li>
-    <li v-for="(item,index) in dataList" :key="item.id">
+  <div class="role-table">
+    <el-row class="header">
+      <el-col :span="6" class="left">
+        <div>菜单列表 </div>
+      </el-col>
+      <el-col :span="18" class="right">
+        <div>功能权限</div>
+      </el-col>
+    </el-row>
+    <div v-for="(item,index) in dataList" :key="item.id">
       <el-checkbox-group v-model="checkedID" @change="handleChange">
-        <div class="left">
-          <!-- <i :class="{'el-icon-caret-right':item.folded,'el-icon-caret-bottom':!item.folded}" v-cloak v-if="item.second" class="item-icon"></i> -->
-          <el-checkbox :label="item.authSign" v-cloak> {{isMapName(item.level,item.authSign)}}</el-checkbox>
-          <!-- <span v-if="item.second" v-cloak>{{item.title}}</span> -->
-          <!-- <el-checkbox v-if="item.children" @change="checkSecondAll(item)" v-model="item.firstCheckAll">{{item.title}}</el-checkbox> -->
-        </div>
-        <div class="right" v-if="item.authSign=='1'">
-          <el-checkbox v-for="p in item.children[0].children" :label="p.authSign" :key="p.id" v-cloak>
-            {{isMapName(p.level,p.authSign)}}
-          </el-checkbox>
-        </div>
-        <div class="line"></div>
-        <ul v-show="item.children" class="second-ul" v-if="item.authSign!='1'">
-          <li class="h40" v-for="(second,cur) in item.children" :key="second.id">
-            <div class="left">
-              <el-checkbox :label="second.authSign" v-model="second.isSelect" v-cloak>
-                {{isMapName(second.level,second.authSign)}}
-              </el-checkbox>
+        <el-row v-if="item.authSign=='1'">
+          <el-col :span="6" class="left">
+            <el-checkbox :label="item.authSign" v-cloak> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+          </el-col>
+          <el-col :span="17" class="right">
+            <el-checkbox v-for="p in item.children[0].children" :label="p.authSign" :key="p.id" v-cloak>
+              {{isMapName(p.level,p.authSign)}}
+            </el-checkbox>
+          </el-col>
+        </el-row>
+        <el-collapse @change="toggleChange" v-model="activeName" v-else>
+          <el-collapse-item :name="item.authSign">
+            <template slot="title">
+              <el-row>
+                <el-col :span="6" class="left">
+                  <el-checkbox :label="item.authSign" v-cloak @change="checkFirstAll(item)" v-model="item.firstCheckAll"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+                </el-col>
+              </el-row>
+            </template>
+            <div v-show="item.children" class="second-ul">
+              <el-row v-for="(second,cur) in item.children" :key="second.id">
+                <el-col :span="6" class="left">
+                  <el-checkbox @change="checkSecondAll(second,item)" v-model="second.SecondCheckAll" :label="second.authSign" v-cloak>
+                    {{isMapName(second.level,second.authSign)}}
+                  </el-checkbox>
+                </el-col>
+                <el-col :span="18" class="right">
+                  <el-checkbox @change="checkthird(p,second,item)" v-model="p.thirdCheckAll" v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
+                    {{isMapName(p.level,p.authSign)}}
+                  </el-checkbox>
+                </el-col>
+              </el-row>
             </div>
-            <div class="right">
-              <el-checkbox v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
-                {{isMapName(p.level,p.authSign)}}
-              </el-checkbox>
-            </div>
-            <div class="line"></div>
-          </li>
-        </ul>
-      </el-checkbox-group>
-    </li>
-  </ul>
+          </el-collapse-item>
+        </el-collapse>
 
+      </el-checkbox-group>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -52,7 +63,8 @@ export default {
   },
   data() {
     return {
-      checkedID: []
+      checkedID: [],
+      activeName: []
     }
   },
   watch: {
@@ -79,138 +91,128 @@ export default {
     handleChange(value) {
       this.checkedID = value
       this.$emit('checkedID', this.checkedID)
+      console.log(value)
+    },
+    toggleChange(value) {
       // console.log(value)
+      // this.checkedID.indexOf(value)
     },
-    // 切换下级是否展开
-    toggleExpanded: function(trIndex) {
-      const record = this.formatData[trIndex]
-      record._expanded = !record._expanded
-    },
-    // 图标显示
-    iconShow(index, record) {
-      return (index === 0 && record.children && record.children.length > 0)
-    },
-    fold: function(item) {
-      if (typeof item.folded === 'undefined') {
-        this.$set(item, 'folded', true)
+    //  一级目录全选
+    checkFirstAll(data) {
+      this.activeName.push(data.authSign)
+      if (typeof data.firstCheckAll === 'undefined') {
+        this.$set(data, 'firstCheckAll', true)
       } else {
-        item.folded = !item.folded
+        data.firstCheckAll = !data.firstCheckAll
+      }
+      if (data.firstCheckAll) {
+        data.children.forEach(items => {
+          if (typeof items.SecondCheckAll === 'undefined') {
+            this.$set(items, 'SecondCheckAll', true)
+          }
+          if (this.checkedID.indexOf(items.authSign) < 0) {
+            this.checkedID.push(items.authSign)
+          }
+
+          items.children.forEach(item => {
+            if (this.checkedID.indexOf(item.authSign) < 0) {
+              this.checkedID.push(item.authSign)
+            }
+          })
+        })
+      } else {
+        data.children.forEach(items => {
+          if (items.SecondCheckAll) {
+            items.SecondCheckAll = !items.SecondCheckAll
+          }
+          if (this.checkedID.indexOf(items.authSign) >= 0) {
+            this.checkedID.splice(this.checkedID.indexOf(items.authSign), 1)
+          }
+          items.children.forEach(item => {
+            if (item.thirdCheckAll) {
+              item.thirdCheckAll = !item.thirdCheckAll
+            }
+            if (this.checkedID.indexOf(item.authSign) >= 0) {
+              this.checkedID.splice(this.checkedID.indexOf(item.authSign), 1)
+            }
+          })
+        })
       }
     },
-    // 全选一项
-    handleCheckAllChange(event, item, second) {
-      const arr = []
-      for (let a = 0; a < second.list.length; a++) {
-        arr.push(second.list[a].id)
+    checkSecondAll(data, parentDate) {
+      if (typeof data.SecondCheckAll === 'undefined') {
+        this.$set(data, 'SecondCheckAll', true)
+      } else {
+        data.SecondCheckAll = !data.SecondCheckAll
       }
-      if (typeof second.checkedCities === 'undefined') {
-        this.$set(second, 'checkedCities', arr)
-      }
-      second.checkedCities = event.target.checked ? arr : []
-      // if (typeof second === "undefined") {
-      //     this.$set(second, "isIndeterminate", false)
-      // }
-      // second.isIndeterminate = false;
-      if (typeof second.checkAll === 'undefined') {
-        this.$set(second, 'checkAll', true)
-      }
-      if (typeof item.isIndeterminate === 'undefined') {
-        this.$set(item, 'isIndeterminate', true)
-      }
-      for (let a = 0; a < item.second.length; a++) {
-        if (!item.second[a].checkAll) {
-          item.isIndeterminate = true
-          for (let a = 0; a < item.second.length; a++) {
-            if (item.second[a].checkAll) {
-              break
-            } else {
-              item.isIndeterminate = false
-              item.firstCheckAll = false
-            }
+      if (data.SecondCheckAll) {
+        if (this.checkedID.indexOf(parentDate.authSign) < 0) {
+          this.checkedID.push(parentDate.authSign)
+        }
+        // const arr = []
+        data.children.forEach(items => {
+          if (this.checkedID.indexOf(items.authSign) < 0) {
+            this.checkedID.push(items.authSign)
           }
-          break
-        } else {
-          item.isIndeterminate = false
-          item.firstCheckAll = true
+        })
+      } else {
+        if (!this.FilterId(parentDate)) {
+          if (parentDate.firstCheckAll) {
+            parentDate.firstCheckAll = !parentDate.firstCheckAll
+          }
+          this.checkedID.splice(this.checkedID.indexOf(parentDate.authSign), 1)
+        }
+        data.children.forEach(items => {
+          if (items.thirdCheckAll) {
+            items.thirdCheckAll = !items.thirdCheckAll
+          }
+          if (this.checkedID.indexOf(items.authSign) >= 0) {
+            this.checkedID.splice(this.checkedID.indexOf(items.authSign), 1)
+          }
+        })
+      }
+    },
+    // 过滤目录
+    FilterId(pdata) {
+      return pdata.children.some(item => this.checkedID.indexOf(item.authSign) >= 0)
+    },
+    // 三级目录
+    checkthird(third, second, first) {
+      if (typeof second.SecondCheckAll === 'undefined') {
+        this.$set(second, 'SecondCheckAll', true)
+      }
+      if (typeof first.firstCheckAll === 'undefined') {
+        this.$set(first, 'firstCheckAll', true)
+      }
+      if (typeof third.thirdCheckAll === 'undefined') {
+        this.$set(third, 'thirdCheckAll', true)
+      } else {
+        third.thirdCheckAll = !third.thirdCheckAll
+      }
+      if (third.thirdCheckAll) {
+        if (this.checkedID.indexOf(second.authSign) < 0) {
+          this.checkedID.push(second.authSign)
+        }
+        if (this.checkedID.indexOf(first.authSign) < 0) {
+          this.checkedID.push(first.authSign)
+        }
+      } else {
+        if (this.checkedID.indexOf(third.authSign) >= 0) {
+          this.checkedID.splice(this.checkedID.indexOf(third.authSign), 1)
+        }
+        if (!this.FilterId(second)) {
+          if (second.SecondCheckAll) {
+            second.SecondCheckAll = !second.SecondCheckAll
+          }
+          this.checkedID.splice(this.checkedID.indexOf(second.authSign), 1)
+        }
+        if (!this.FilterId(first)) {
+          if (first.firstCheckAll) {
+            first.firstCheckAll = !first.firstCheckAll
+          }
+          this.checkedID.splice(this.checkedID.indexOf(first.authSign), 1)
         }
       }
-    },
-    // 单选
-    handleCheckedCitiesChange(item, second) {
-      const checkedCount = second.checkedCities.length
-      if (typeof second.checkAll === 'undefined') {
-        this.$set(second, 'checkAll', false)
-      }
-      if (typeof second.isIndeterminate === 'undefined') {
-        this.$set(second, 'isIndeterminate', false)
-      }
-      if (typeof item.isIndeterminate === 'undefined') {
-        this.$set(item, 'isIndeterminate', true)
-      }
-      second.isIndeterminate = checkedCount > 0 && checkedCount < second.list.length
-      second.checkAll = checkedCount === second.list.length
-      if (checkedCount === 0) {
-        second.isIndeterminate = false
-      }
-      for (let a = 0; a < item.second.length; a++) {
-        if (!item.second[a].checkAll) {
-          item.isIndeterminate = true
-          for (let b = 0; b < item.second.length; b++) {
-            if (item.second[b].checkedCities.length > 0) {
-              break
-            } else {
-              item.isIndeterminate = false
-              item.firstCheckAll = false
-            }
-          }
-          break
-        } else {
-          item.isIndeterminate = false
-          item.firstCheckAll = true
-        }
-      }
-    },
-    // 点击所有
-    checkSecondAll: function(item) {
-      if (typeof item.firstCheckAll === 'undefined') {
-        this.$set(item, 'firstCheckAll', true)
-      }
-      for (let a = 0; a < item.second.length; a++) {
-        this.checkItemAll(item.firstCheckAll, item.second[a])
-      }
-      item.isIndeterminate = false
-    },
-    checkItemAll: function(flag, item) {
-      const arr = []
-      for (let a = 0; a < item.list.length; a++) {
-        arr.push(item.list[a].id)
-      }
-      if (typeof item.checkedCities === 'undefined') {
-        this.$set(item, 'checkedCities', arr)
-      }
-      item.checkedCities = flag ? arr : []
-      item.checkAll = flag
-    },
-
-    // 没有二级菜单
-    handleOneCheckedCitiesChange: function(item) {
-      const checkedCount = item.checkedCities.length
-      if (typeof item.isIndeterminate === 'undefined') {
-        this.$set(item, 'isIndeterminate', false)
-      }
-      if (typeof item.checkAll === 'undefined') {
-        this.$set(item, 'checkAll', false)
-      }
-      item.isIndeterminate = checkedCount > 0 && checkedCount < item.list.length
-      item.checkAll = checkedCount === item.list.length
-    },
-    handleOneCheckAll: function(event, item) {
-      const arr = []
-      for (let a = 0; a < item.list.length; a++) {
-        arr.push(item.list[a].id)
-      }
-
-      item.checkedCities = event.target.checked ? arr : []
     }
   }
 
@@ -227,64 +229,37 @@ export default {
 .header {
   height: 40px;
   line-height: 40px;
-  border-bottom: 1px solid #e7e7e7;
   background: #f8f8f9;
   text-align: center;
+  border-bottom: 1px solid #ebeef5;
 }
-
-.vertical-line {
-  width: 1px;
-  height: 100%;
-  background: #ddd;
-  position: absolute;
-  left: 20%;
-  top: 0;
+.el-collapse {
+  border-top: 1px solid #ebeef5;
+  border-bottom: none;
 }
-.first-th {
-  padding-left: 10px;
+.el-collapse-item__content {
+  padding-bottom: 0;
 }
 .left {
-  width: 20%;
-  float: left;
   padding-left: 10px;
-  user-select: none;
-  cursor: pointer;
   border-right: 1px solid #e7e7e7;
-  line-height: 40px;
-}
-
-.one {
-  padding-left: 20px;
 }
 
 .right {
-  width: 80%;
-  float: right;
   padding-left: 10px;
-  line-height: 40px;
-  height: 40px;
 }
-
-.item-icon {
-  margin-left: -5px;
-  padding: 5px;
+.second-ul {
+  /* border-top: 1px solid #ebeef5; */
 }
-
-.line {
-  clear: both;
-  width: 100%;
-  height: 1px;
-  background: #e0e0e0;
-}
-/* .h40 {
-  height: 39px;
-  line-height: 39px;
-} */
-[v-cloak] {
-  display: none;
-}
-
 .second-ul .left {
   padding-left: 35px;
+  line-height: 40px;
+  height: 40px;
+  border-top: 1px solid #ebeef5;
+}
+.second-ul .right {
+  line-height: 40px;
+  height: 40px;
+  border-top: 1px solid #ebeef5;
 }
 </style>

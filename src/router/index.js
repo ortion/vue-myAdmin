@@ -63,6 +63,20 @@ export const asyncRouterMap = [
     alwaysShow: true,
     meta: { title: '系统', icon: 'system', index: '8' },
     children: [
+      {
+        //  热门地址管理
+        path: 'hotAddress',
+        name: 'hotAddress',
+        component: () => import('@/views/system/hotAddress/hotAddress'),
+        meta: { title: '热门地址管理', index: '8-1' }
+      },
+      {
+        //  热门搜索管理
+        path: 'hotKeyword',
+        name: 'hotKeyword',
+        component: () => import('@/views/system/hotKeyword/hotKeyword'),
+        meta: { title: '热门搜索管理', index: '8-2' }
+      },
       //  APP首页管理
       {
         path: 'APPindexManage',

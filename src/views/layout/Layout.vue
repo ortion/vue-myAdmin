@@ -2,51 +2,76 @@
   <div class="app-wrapper" :class="classObj">
     <!-- <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"></div> -->
     <sidebar class="sidebar-container"></sidebar>
-    <app-header @changeStatus="changeStatus" :dialog-status="IsSHOWdialog">header</app-header>
+    <app-header @changeStatus="changeStatus">header</app-header>
     <div class="main-container">
-      <div style="min-height: 600px;">
-        <navbar></navbar>
-        <app-main></app-main>
-      </div>
-      <div class="app-footer">Footer</div>
-
-      <el-dialog title="修改密码" :visible.sync="IsSHOWdialog" :show-close="false">
-        <el-form :model="passForm" label-width="100px" :rules="passRules" ref="passForm">
-          <el-form-item label="旧密码" prop="oldPass">
-            <el-input type="password" v-model="passForm.oldPass" auto-complete="off" placeholder="请输入旧密码"></el-input>
-          </el-form-item>
-          <el-form-item label="新密码" prop="newPass">
-            <el-input type="password" v-model="passForm.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
-          </el-form-item>
-          <el-form-item label="确认密码" prop="checkPass">
-            <el-input type="password" v-model="passForm.checkPass" auto-complete="off" placeholder="请确认新密码"></el-input>
-          </el-form-item>
-
-          <el-form-item>
-            <el-button @click="cancelDialog">取消</el-button>
-            <el-button type="primary" @click.native.prevent="submitPassword">确定</el-button>
-          </el-form-item>
-        </el-form>
-      </el-dialog>
-
+      <navbar></navbar>
+      <app-main></app-main>
     </div>
+    <div class="app-footer">Footer</div>
+
+    <el-dialog title="修改密码" :visible.sync="IsUpdatepwd" :show-close="false">
+      <el-form :model="passForm" label-width="100px" :rules="passRules" ref="passForm">
+        <el-form-item label="旧密码" prop="oldPass">
+          <el-input type="password" v-model="passForm.oldPass" auto-complete="off" placeholder="请输入旧密码"></el-input>
+        </el-form-item>
+        <el-form-item label="新密码" prop="newPass">
+          <el-input type="password" v-model="passForm.newPass" auto-complete="off" placeholder="请输入新密码"></el-input>
+        </el-form-item>
+        <el-form-item label="确认密码" prop="checkPass">
+          <el-input type="password" v-model="passForm.checkPass" auto-complete="off" placeholder="请确认新密码"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="cancelDialog">取消</el-button>
+          <el-button type="primary" @click.native.prevent="submitPassword">确定</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog title="用户信息" :visible.sync="IsUserinfo">
+      <ul>
+        <li>商户名称：{{merchantName}}</li>
+        <li>用户名：{{userName}}</li>
+        <li>用户姓名：{{realName}}</li>
+      </ul>
+    </el-dialog>
+  </div>
 
   </div>
 </template>
-
 <script>
 import { Navbar, Sidebar, AppMain, AppHeader } from './components'
 import ResizeMixin from './mixin/ResizeHandler'
 import { updatePassword } from '@/api/login'
+import { mapGetters } from 'vuex'
 export default {
   name: 'layout',
+  computed: {
+    ...mapGetters([
+      'userName',
+      'merchantName',
+      'realName'
+    ]),
+    sidebar() {
+      return this.$store.state.app.sidebar
+    },
+    // device() {
+    //   return this.$store.state.app.device
+    // },
+
+    classObj() {
+      return {
+        hideSidebar: !this.sidebar.opened,
+        withoutAnimation: this.sidebar.withoutAnimation,
+        mobile: this.device === 'mobile'
+      }
+    }
+  },
   components: {
     Navbar,
     Sidebar,
     AppMain,
     AppHeader
   },
-  props: ['dialogStatus'],
+
   mixins: [ResizeMixin],
   data() {
     var validateNPass = (rule, value, callback) => {
@@ -71,7 +96,8 @@ export default {
       }
     }
     return {
-      IsSHOWdialog: false,
+      IsUserinfo: false,
+      IsUpdatepwd: false,
       passForm: {
         oldPass: '',
         newPass: '',
@@ -93,31 +119,22 @@ export default {
       loading: false
     }
   },
-  computed: {
-    sidebar() {
-      return this.$store.state.app.sidebar
-    },
-    // device() {
-    //   return this.$store.state.app.device
-    // },
 
-    classObj() {
-      return {
-        hideSidebar: !this.sidebar.opened,
-        withoutAnimation: this.sidebar.withoutAnimation,
-        mobile: this.device === 'mobile'
-      }
-    }
-  },
   methods: {
     cancelDialog() {
-      this.IsSHOWdialog = false
-      this.UpdateInfo.oldPwd = ''
-      this.UpdateInfo.newPwd = ''
-      this.newPwdAgain = ''
+      this.IsUpdatepwd = false
+      this.passForm = {
+        oldPass: '',
+        newPass: '',
+        checkPass: ''
+      }
     },
-    changeStatus(boot) {
-      this.IsSHOWdialog = boot
+    changeStatus(info) {
+      if (info === 'userInfo') {
+        this.IsUserinfo = true
+      } else if (info === 'updatePwd') {
+        this.IsUpdatepwd = true
+      }
     },
     handleClickOutside() {
       this.$store.dispatch('CloseSideBar', { withoutAnimation: false })
@@ -128,7 +145,7 @@ export default {
           this.loading = true
           updatePassword(this.passForm).then(() => {
             this.loading = false
-            this.IsSHOWdialog = false
+            this.IsUpdatepwd = false
             this.$store.dispatch('FedLogOut').then(() => {
               this.$message({
                 message: '密码修改成功请重新登陆',
@@ -156,7 +173,7 @@ body {
 .app-wrapper {
   @include clearfix;
   position: relative;
-  // height: 100%;
+  height: 100%;
   width: 100%;
 }
 
