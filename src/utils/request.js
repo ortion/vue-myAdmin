@@ -30,6 +30,7 @@ service.interceptors.response.use(
     */
     const res = response.data
     if (res.code !== '0000') {
+      console.log(res.msg)
       Message({
         message: res.msg,
         type: 'error',

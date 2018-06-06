@@ -22,7 +22,7 @@
         </el-form-item>
         <el-form-item>
           <el-button @click="cancelDialog">取消</el-button>
-          <el-button type="primary" @click.native.prevent="submitPassword">确定</el-button>
+          <el-button type="primary" @click.native.prevent="submitPassword" :loading="loading">确定</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>

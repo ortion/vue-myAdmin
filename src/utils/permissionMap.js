@@ -56,26 +56,22 @@ const PermissionList = [
           },
           {
             'authSign': '2-2-2',
-            'title': '查询'
-          },
-          {
-            'authSign': '2-2-3',
             'title': '新建门店'
           },
           {
-            'authSign': '2-2-4',
+            'authSign': '2-2-3',
             'title': '详情'
           },
           {
-            'authSign': '2-2-5',
+            'authSign': '2-2-4',
             'title': '删除'
           },
           {
-            'authSign': '2-2-6',
+            'authSign': '2-2-5',
             'title': '临时关店/开启'
           },
           {
-            'authSign': '2-2-7',
+            'authSign': '2-2-6',
             'title': '商品管理'
           }
         ]

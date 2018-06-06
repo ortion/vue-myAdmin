@@ -49,6 +49,11 @@ export default {
       default: false
     }
   },
+  data() {
+    return {
+      arr: []
+    }
+  },
   methods: {
     hasOneShowingChildren(children) {
       const showingChildren = children.filter(item => {

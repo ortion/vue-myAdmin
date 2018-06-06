@@ -12,10 +12,10 @@
       <el-checkbox-group v-model="checkedID" @change="handleChange">
         <el-row v-if="item.authSign=='1'">
           <el-col :span="6" class="left">
-            <el-checkbox :label="item.authSign" v-cloak @change="checkIndex(item)" v-model="item.CheckAll"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+            <el-checkbox :label="item.authSign" v-cloak disabled> {{isMapName(item.level,item.authSign)}}</el-checkbox>
           </el-col>
-          <el-col :span="17" class="right">
-            <el-checkbox @change="checkIndexChildren(p,item)" v-model="item.childrenCheckAll" v-for="p in item.children[0].children" :label="p.authSign" :key="p.id" v-cloak>
+          <el-col :span="18" class="right">
+            <el-checkbox v-for="p in item.children[0].children" :label="p.authSign" :key="p.id" v-cloak>
               {{isMapName(p.level,p.authSign)}}
             </el-checkbox>
           </el-col>
@@ -23,11 +23,9 @@
         <el-collapse @change="toggleChange" v-model="activeName" v-else>
           <el-collapse-item :name="item.authSign">
             <template slot="title">
-              <el-row>
-                <el-col :span="6" class="left">
-                  <el-checkbox :label="item.authSign" v-cloak @change="checkFirstAll(item)" v-model="item.firstCheckAll"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
-                </el-col>
-              </el-row>
+              <div class="fir-title">
+                <el-checkbox :label="item.authSign" v-cloak @change="checkFirstAll(item)" v-model="item.firstCheckAll"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+              </div>
             </template>
             <div v-show="item.children" class="second-ul">
               <el-row v-for="(second,cur) in item.children" :key="second.id">
@@ -37,7 +35,7 @@
                   </el-checkbox>
                 </el-col>
                 <el-col :span="18" class="right">
-                  <el-checkbox @change="checkthird(p,second,item)" v-model="p.thirdCheckAll" v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
+                  <el-checkbox :disabled="checkboxInit(p.authSign)" @change="checkthird(p,second,item)" v-model="p.thirdCheckAll" v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
                     {{isMapName(p.level,p.authSign)}}
                   </el-checkbox>
                 </el-col>
@@ -63,8 +61,15 @@ export default {
   },
   data() {
     return {
-      checkedID: [],
-      activeName: []
+      checkedID: ['1'],
+      activeName: [],
+      disabledList: ['2-1-1', '2-1-3', '2-2-1', '2-2-3', '2-3-1', '2-3-3',
+        '2-5-1', '2-5-3', '2-6-1', '2-7-1', '2-7-2', '2-8-1', '3-1-1', '3-2-1',
+        '4-1-1', '4-1-5', '4-2-1', '4-3-1', '4-3-5', '5-1-1', '5-2-1', '5-2-2',
+        '5-3-2', '5-4-1', '5-4-2', '5-5-1', '5-5-2', '5-6-1', '5-6-2', '6-1-1',
+        '6-1-3', '6-2-1', '6-3-1', '6-3-2', '7-1-1', '7-2-1', '7-2-2',
+        '7-3-1', '7-3-2', '7-3-3', '8-4-3', '8-6-1', '8-6-2'
+      ]
     }
   },
   watch: {
@@ -97,51 +102,59 @@ export default {
       // console.log(value)
       // this.checkedID.indexOf(value)
     },
+    // 初始化判断不可编辑
+    checkboxInit(index) {
+      if (this.disabledList.indexOf(index) < 0) {
+        return false // 可勾选
+      } else {
+        return true // 不可勾选
+      }
+    },
     // 首页目录
-    checkIndex(item) {
-      if (typeof item.CheckAll === 'undefined') {
-        this.$set(item, 'CheckAll', true)
-      } else {
-        item.CheckAll = !item.CheckAll
-      }
-      if (item.CheckAll) {
-        if (typeof item.children[0].children[0].childrenCheckAll === 'undefined') {
-          this.$set(item.children[0].children[0], 'childrenCheckAll', true)
-        }
-        if (this.checkedID.indexOf(item.children[0].children[0].authSign) < 0) {
-          this.checkedID.push(item.children[0].children[0].authSign)
-        }
-      } else {
-        if (item.children[0].children[0].childrenCheckAll) {
-          item.children[0].children[0].childrenCheckAll = !item.children[0].children[0].childrenCheckAll
-        }
-        if (this.checkedID.indexOf(item.children[0].children[0].authSign) >= 0) {
-          this.checkedID.splice(this.checkedID.indexOf(item.children[0].children[0].authSign), 1)
-        }
-      }
-    },
-    checkIndexChildren(children, item) {
-      if (typeof item.firstCheckAll === 'undefined') {
-        this.$set(item, 'firstCheckAll', true)
-      }
-      if (typeof children.SecondCheckAll === 'undefined') {
-        this.$set(children, 'SecondCheckAll', true)
-      } else {
-        children.SecondCheckAll = !children.SecondCheckAll
-      }
-      if (children.SecondCheckAll) {
-        if (this.checkedID.indexOf(item.authSign) < 0) {
-          this.checkedID.push(item.authSign)
-        }
-      } else {
-        if (item.firstCheckAll) {
-          item.firstCheckAll = !item.firstCheckAll
-        }
-        if (this.checkedID.indexOf(item.authSign) >= 0) {
-          this.checkedID.splice(this.checkedID.indexOf(item.authSign), 1)
-        }
-      }
-    },
+    // checkIndex(item) {
+    //   if (typeof item.CheckAll === 'undefined') {
+    //     this.$set(item, 'CheckAll', true)
+    //   } else {
+    //     item.CheckAll = !item.CheckAll
+    //   }
+    //   if (item.CheckAll) {
+    //     if (typeof item.children[0].children[0].childrenCheckAll === 'undefined') {
+    //       this.$set(item.children[0].children[0], 'childrenCheckAll', true)
+    //     }
+    //     if (this.checkedID.indexOf(item.children[0].children[0].authSign) < 0) {
+    //       this.checkedID.push(item.children[0].children[0].authSign)
+    //     }
+    //   } else {
+    //     if (item.children[0].children[0].childrenCheckAll) {
+    //       item.children[0].children[0].childrenCheckAll = !item.children[0].children[0].childrenCheckAll
+    //     }
+    //     if (this.checkedID.indexOf(item.children[0].children[0].authSign) >= 0) {
+    //       this.checkedID.splice(this.checkedID.indexOf(item.children[0].children[0].authSign), 1)
+    //     }
+    //   }
+    // },
+    // checkIndexChildren(children, item) {
+    //   if (typeof item.firstCheckAll === 'undefined') {
+    //     this.$set(item, 'firstCheckAll', true)
+    //   }
+    //   if (typeof children.SecondCheckAll === 'undefined') {
+    //     this.$set(children, 'SecondCheckAll', true)
+    //   } else {
+    //     children.SecondCheckAll = !children.SecondCheckAll
+    //   }
+    //   if (children.SecondCheckAll) {
+    //     if (this.checkedID.indexOf(item.authSign) < 0) {
+    //       this.checkedID.push(item.authSign)
+    //     }
+    //   } else {
+    //     if (item.firstCheckAll) {
+    //       item.firstCheckAll = !item.firstCheckAll
+    //     }
+    //     if (this.checkedID.indexOf(item.authSign) >= 0) {
+    //       this.checkedID.splice(this.checkedID.indexOf(item.authSign), 1)
+    //     }
+    //   }
+    // },
     //  一级目录全选
     checkFirstAll(data) {
       this.activeName.push(data.authSign)
@@ -293,6 +306,9 @@ export default {
 }
 .el-collapse-item__content {
   padding-bottom: 0;
+}
+.fir-title{
+    padding-left: 10px;
 }
 .left {
   padding-left: 10px;

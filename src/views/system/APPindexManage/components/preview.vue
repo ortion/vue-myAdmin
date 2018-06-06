@@ -1,7 +1,7 @@
 <template>
     <div class="App-carousel">
         <div :mouseenter="hoverHandle" class="editing-states">
-            <el-tag class="editing-button">编辑</el-tag>
+            <!-- <el-tag class="editing-button">编辑</el-tag> -->
             <el-carousel :interval="5000" arrow="never" height="180px" :autoplay="false">
                 <el-carousel-item v-for="item in 4" :key="item">
                     <img :src="exmple" alt="">
@@ -64,7 +64,6 @@
                     <div class="media-left">
                         <a href="#">
                             <img :src="logo" alt="">
-                            <!-- <img class="media-object" src="..." alt="..."> -->
                         </a>
                     </div>
                     <div class="media-body">

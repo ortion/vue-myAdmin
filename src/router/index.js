@@ -56,6 +56,62 @@ export default new Router({
   routes: constantRouterMap
 })
 export const asyncRouterMap = [
+  // 企业
+  {
+    path: '/company',
+    component: Layout,
+    name: 'Company',
+    alwaysShow: true,
+    meta: { title: '企业', icon: 'company', index: '2' },
+    children: [
+      {
+        //  企业管理
+        path: 'companyManage',
+        name: 'companyManage',
+        component: () => import('@/views/company/companyManage/companyManage'),
+        meta: { title: '企业管理', index: '2-1' }
+      },
+      {
+        //  企业管理
+        path: 'shopManage',
+        name: 'shopManage',
+        component: () => import('@/views/company/shopManage/shopManage'),
+        meta: { title: '门店管理', index: '2-2' }
+      }
+    ]
+  },
+  // 商品
+  {
+    path: '/goods',
+    component: Layout,
+    name: 'Goods',
+    alwaysShow: true,
+    meta: { title: '商品', icon: 'goods', index: '3' },
+    children: [
+      {
+        //  商品管理
+        path: 'goodsManage',
+        name: 'goodsManage',
+        component: () => import('@/views/goods/goodsManage/goodsManage'),
+        meta: { title: '商品管理', index: '3-1' }
+      },
+      {
+        //  商品审核
+        path: 'goodsReview',
+        name: 'goodsReview',
+        component: () => import('@/views/goods/goodsReview/goodsReview'),
+        meta: { title: '商品审核', index: '3-2' }
+      },
+      {
+        //  商品分类
+        path: 'goodsCategory',
+        name: 'goodsCategory',
+        component: () => import('@/views/goods/goodsCategory/goodsCategory'),
+        meta: { title: '商品分类', index: '3-3' }
+      }
+    ]
+  },
+  // 系统
   {
     path: '/system',
     component: Layout,

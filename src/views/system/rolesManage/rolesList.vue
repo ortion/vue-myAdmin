@@ -2,9 +2,11 @@
   <div class="app-container">
     <div class="filter-container">
       <h3>权限管理</h3>
+       <div style="text-align:right">
       <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
+       </div>
     </div>
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
+    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row empty-text="暂无数据">
       <el-table-column align="center" label='序号'>
         <template slot-scope="scope">
           {{scope.$index+1}}

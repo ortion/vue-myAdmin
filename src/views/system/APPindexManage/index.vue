@@ -5,16 +5,23 @@
                 <preview></preview>
             </el-col>
             <el-col :span="15">
-                <div class="bg-purple"></div>
+                <div class="app-manage">
+                    <banner-manage></banner-manage>
+                </div>
             </el-col>
         </el-row>
     </div>
 </template>
 <script>
 import preview from './components/preview'
+import bannerManage from './components/bannerManage'
+
 export default {
   name: 'APPindexManage',
-  components: { preview },
+  components: {
+    preview,
+    bannerManage
+  },
   data() {
     return {
 
@@ -25,4 +32,8 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.app-manage {
+  border: solid 1px #e6e6e6;
+  padding: 10px 20px;
+}
 </style>
