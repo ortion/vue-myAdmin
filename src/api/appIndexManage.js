@@ -21,3 +21,24 @@ export function addBanner(data) {
     }
   })
 }
+// 宫格管理
+export function getIconList() {
+  return request({
+    url: 'app/palace/load',
+    method: 'POST',
+    data: {
+      'token': getToken()
+    }
+  })
+}
+export function addIcon(data) {
+  return request({
+    url: 'app/palace/update',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'data': data
+
+    }
+  })
+}

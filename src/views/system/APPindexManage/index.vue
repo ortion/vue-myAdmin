@@ -2,12 +2,12 @@
   <div class="app-container">
     <el-row :gutter="20">
       <el-col :span="9">
-        <preview :bannerlist="bannerList"></preview>
+        <preview @openStatus="openStatus"></preview>
       </el-col>
       <el-col :span="15">
         <div class="app-manage">
-          <banner-manage :bannerlist="bannerList" @updatebanner="updateBanner"></banner-manage>
-          <!-- <icon-manage></icon-manage> -->
+          <banner-manage v-show="opening=='banner'"></banner-manage>
+          <icon-manage v-show="opening=='icon'" :now-icon="nowIcon"></icon-manage>
         </div>
       </el-col>
     </el-row>
@@ -17,7 +17,7 @@
 import preview from './components/preview'
 import bannerManage from './components/bannerManage'
 import iconManage from './components/iconManage'
-import { getBannerList } from '@/api/appIndexManage'
+
 export default {
   name: 'APPindexManage',
   components: {
@@ -27,27 +27,20 @@ export default {
   },
   data() {
     return {
-      bannerList: [],
-      listLoading: true
-
+      opening: 'banner',
+      nowIcon: {}
     }
-  },
-  created() {
-    this.getAppbannerList()
   },
   methods: {
-    updateBanner(boot) {
-      if (boot) {
-        this.getAppbannerList()
+    openStatus(status) {
+      if (status === 'banner') {
+        this.opening = status
+      } else {
+        this.opening = 'icon'
+        this.nowIcon = status
       }
-    },
-    getAppbannerList() {
-      this.listLoading = true
-      getBannerList().then(response => {
-        this.bannerList = response.data
-        this.listLoading = false
-      })
     }
+
   }
 
 }

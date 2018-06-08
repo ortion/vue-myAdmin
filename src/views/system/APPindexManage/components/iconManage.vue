@@ -2,45 +2,94 @@
   <div>
     <h3>宫格管理</h3>
     <div class="preview-img">
-      <img :src="logo" class="avatar">
+      <img :src="updateIcon.imageUrl" class="avatar" v-if="updateIcon.imageUrl">
+      <img :src="logo" class="avatar" v-else>
     </div>
-    <div class="avatar-uploader">
-      <el-upload action="https://jsonplaceholder.typicode.com/posts/" :show-file-list="false" :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
-
-        <i class="el-icon-plus avatar-uploader-icon"></i>
-      </el-upload>
+    <div class="avatar-uploader" @click="openPhotos()">
+      <i class="el-icon-plus avatar-uploader-icon"></i>
     </div>
     <div class="submit-button">
-      <el-button type="info" plain>还原</el-button>
-      <el-button type="primary">确认</el-button>
+      <el-button type="info" plain @click="returnPhone()">还原</el-button>
+      <el-button type="primary" @click="onSave">确认</el-button>
     </div>
+    <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isClose" @open="isOpen">
+      <photo-album :photoType="'icon'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
+
+    </el-dialog>
   </div>
 </template>
 <script>
 import logo from '@/assets/logo.png'
+import PhotoAlbum from '@/components/PhotoAlbum'
+import { getIconPic } from '@/api/picManage'
+import { addIcon } from '@/api/appIndexManage'
 export default {
   name: 'iconManage',
+  components: {
+    PhotoAlbum
+  },
+  props: ['nowIcon'],
   data() {
     return {
       logo,
-      imageUrl: ''
+      imageUrl: '',
+      isPhotosDialog: false,
+      picList: [],
+      isCloseStatus: false,
+      updateIcon: {
+        id: '',
+        imageUrl: ''
+      }
+    }
+  },
+  watch: {
+    nowIcon() {
+      this.updateIcon.id = this.nowIcon.id
+      this.updateIcon.imageUrl = this.nowIcon.picUrl
     }
   },
   methods: {
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw)
+    onSave() {
+      addIcon(this.updateIcon).then(response => {
+        this.$message({
+          type: 'success',
+          message: '保存成功!'
+        })
+        this.$store.commit('UPDATEICON_STATUS', true)
+      })
     },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg'
-      const isLt2M = file.size / 1024 / 1024 < 2
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!')
+    // 还原
+    returnPhone() {
+      console.log(this.nowIcon)
+      this.updateIcon.imageUrl = this.nowIcon.picUrl
+    },
+    openPhotos(index) {
+      this.isPhotosDialog = true
+      this.getPicList()
+    },
+    // 加载图片库
+    getPicList() {
+      this.listLoading = true
+      getIconPic().then(response => {
+        var data = response.data
+        this.picList = data.reverse()
+        this.listLoading = false
+      })
+    },
+    selectImg(url) {
+      this.isPhotosDialog = false
+      this.updateIcon.imageUrl = url
+    },
+    isClose() {
+      this.isCloseStatus = true
+    },
+    isOpen() {
+      this.isCloseStatus = false
+    },
+    updateData(boot) {
+      if (boot) {
+        this.getPicList()
       }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!')
-      }
-      return isJPG && isLt2M
     }
   }
 }
@@ -76,10 +125,11 @@ export default {
 }
 .avatar {
   border-radius: 50%;
+  width: 100px;
+  height: 100px;
 }
-.submit-button{
+.submit-button {
   padding: 15px 0;
-  text-align: center
-
+  text-align: center;
 }
 </style>

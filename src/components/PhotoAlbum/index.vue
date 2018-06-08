@@ -1,11 +1,11 @@
 <template>
   <div>
-    <div class="nodata" v-if="photoList.length<0">
+    <div class="nodata" v-if="photoList.length<=0">
       暂无图片
     </div>
     <div class="photoGallery" v-else>
       <el-scrollbar wrapClass="photo-scrollbar" style="height:100%;">
-        <div @click="selectImg(item,index)" v-for="(item,index) in photoList" :key="index" class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
+        <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
           <div class="photoGallery-operate">
             <i class="el-icon-success" v-if="!isDeleteStatus&&(index==isIndex)"></i>
             <el-checkbox-group v-model="checkedImg" @change="handleChange" v-if="isDeleteStatus">
@@ -34,23 +34,17 @@
 </template>
 
 <script>
-import { uploadBannerPic, deleteBannerPic, uploadAli } from '@/api/picManage'
+import { uploadBannerPic, deleteBannerPic, uploadIconPic, deleteIconPic } from '@/api/picManage'
 import { client } from '@/utils/alioss'
 export default {
-  props: {
-    photoList: {
-      required: true
-    },
-    closeDialog: {
-      required: true
-    }
-  },
+  props: ['photoType', 'photoList', 'closeDialog'],
   watch: {
     closeDialog(val) {
       if (val) {
         this.checkedImg = []
         // this.selectImgList = []
         this.isIndex = -1
+        this.isDeleteStatus = false
       }
     }
   },
@@ -69,7 +63,7 @@ export default {
       this.$emit('selectImg', this.selectImgUrl)
     },
     // 选择图片
-    selectImg(data, index) {
+    selectPhoto(data, index) {
       this.isIndex = index
       this.selectImgUrl = data.imageUrl
       // 多选
@@ -90,20 +84,25 @@ export default {
     Upload(file) {
       var fileName = 'banner' + file.file.uid
       this.listLoading = true
-      uploadAli().then(response => {
-        console.log(response)
-        client(response.data).put(fileName, file.file).then(result => {
-          this.fileList[0] = { 'name': result.name, 'url': result.url }
-          console.log(this.fileList)
+      // uploadAli().then(response => {
+      //   console.log(response)
+      client().put(fileName, file.file).then(result => {
+        this.fileList[0] = { 'name': result.name, 'url': result.url }
+        if (this.photoType === 'banner') {
           uploadBannerPic(this.fileList).then(res => {
             this.$emit('updatedata', true)
           })
-        }).catch(err => {
-          console.log(err)
-        })
-
-        this.listLoading = false
+        } else if (this.photoType === 'icon') {
+          uploadIconPic(this.fileList).then(res => {
+            this.$emit('updatedata', true)
+          })
+        }
+      }).catch(err => {
+        console.log(err)
       })
+
+      this.listLoading = false
+      // })
     },
     openCheckbox() {
       this.isDeleteStatus = true
@@ -117,14 +116,25 @@ export default {
         this.checkedImg.forEach(item => {
           imgList.push({ 'url': item })
         })
-        deleteBannerPic(imgList).then(res => {
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
+        if (this.photoType === 'banner') {
+          deleteBannerPic(imgList).then(res => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.checkedImg = []
+            this.$emit('updatedata', true)
           })
-          this.checkedImg = []
-          this.$emit('updatedata', true)
-        })
+        } else if (this.photoType === 'icon') {
+          deleteIconPic(imgList).then(res => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.checkedImg = []
+            this.$emit('updatedata', true)
+          })
+        }
       } else {
         this.$message({
           type: 'warning',

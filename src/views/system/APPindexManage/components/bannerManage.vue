@@ -34,7 +34,7 @@
     </div>
     <!-- 图片弹出层 -->
     <el-dialog title="图片库" :visible.sync="isImgDialog" @close="isClose" @open="isOpen">
-      <photo-album :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
+      <photo-album :photoType="'banner'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
     </el-dialog>
 
   </div>
@@ -42,30 +42,33 @@
 <script>
 import exmple from '@/assets/timg.jpeg'
 import PhotoAlbum from '@/components/PhotoAlbum'
-import { getBannerPic, saveBanner } from '@/api/picManage'
+import { getBannerPic } from '@/api/picManage'
+import { addBanner } from '@/api/appIndexManage'
+import { mapGetters } from 'vuex'
 export default {
   name: 'bannerManage',
   components: {
     PhotoAlbum
   },
-  props: {
-    bannerlist: {
-      required: true
-    }
+  computed: {
+    ...mapGetters([
+      'bannerlist'
+    ])
   },
   data() {
     return {
       exmple,
       isImgDialog: false,
       tipShow: false,
+      bannerUpdateList: [],
       backgroundDiv: {},
       picList: [],
       isCloseStatus: false,
       selectEditIndex: Number
     }
   },
-  computed: {
-    bannerUpdateList() {
+  watch: {
+    bannerlist() {
       var arr = []
       this.bannerlist.forEach(item => {
         arr.push(
@@ -75,20 +78,21 @@ export default {
           }
         )
       })
-      return arr
+      this.bannerUpdateList = arr
     }
   },
   methods: {
+
     onSave() {
       this.bannerUpdateList.forEach((item, index) => {
         this.$set(item, 'id', index)
       })
-      saveBanner(this.bannerUpdateList).then(response => {
+      addBanner(this.bannerUpdateList).then(response => {
         this.$message({
           type: 'success',
           message: '保存成功!'
         })
-        this.$emit('updatebanner', true)
+        this.$store.commit('UPDATEBANNER_STATUS', true)
       })
     },
     selectImg(url) {

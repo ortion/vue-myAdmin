@@ -10,17 +10,6 @@ export function getBannerPic() {
     }
   })
 }
-// 保存banner
-export function saveBanner(data) {
-  return request({
-    url: 'app/banner/update',
-    method: 'POST',
-    data: {
-      'token': getToken(),
-      'data': data
-    }
-  })
-}
 // 上传阿里云
 export function uploadAli() {
   return request({
@@ -53,4 +42,33 @@ export function deleteBannerPic(data) {
     }
   })
 }
-
+// icon管理
+export function getIconPic() {
+  return request({
+    url: 'app/palace/picload',
+    method: 'POST',
+    data: {
+      'token': getToken()
+    }
+  })
+}
+export function uploadIconPic(data) {
+  return request({
+    url: 'app/palace/picupload',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'picList': data
+    }
+  })
+}
+export function deleteIconPic(data) {
+  return request({
+    url: 'app/palace/picdelete',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'picList': data
+    }
+  })
+}

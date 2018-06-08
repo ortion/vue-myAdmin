@@ -1,102 +1,105 @@
 <template>
-    <div class="App-carousel">
-        <div :mouseenter="hoverHandle" class="editing-states">
-            <!-- <el-tag class="editing-button">编辑</el-tag> -->
-            <el-carousel v-if="bannerlist.length>0" :interval="5000" arrow="never" height="180px" :autoplay="false">
-                <el-carousel-item v-for="item in bannerlist" :key="item.id">
-                    <img :src="item.imageUrl" alt="">
-                </el-carousel-item>
-            </el-carousel>
-            <img :src="exmple" alt="" v-else>
-        </div>
-        <div class="icon-manage">
-            <el-row>
-                <el-col :span="6">
-                    <div class="grid-content">
-                        <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-            </el-row>
-            <el-row>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-                <el-col :span="6">
-                    <div class="grid-content"> <img :src="logo" alt="">
-                        <p>洗护</p>
-                    </div>
-                </el-col>
-            </el-row>
-        </div>
-        <div class="recommend">
-            <div slot="header" class="card-header clearfix">
-                <span>推荐商家</span>
-            </div>
-            <div class="business-list">
-                <div class="media">
-                    <div class="media-left">
-                        <a href="#">
-                            <img :src="logo" alt="">
-                        </a>
-                    </div>
-                    <div class="media-body">
-                        <h4 class="media-heading">Media heading</h4>
-                        信息
-                    </div>
-                </div>
-
-            </div>
-        </div>
+  <div class="App-carousel">
+    <div @click="goChange('banner')" class="border" :class="{'editing-status':showStatus == 'banner'}">
+      <!-- <el-tag class="editing-button">编辑</el-tag> -->
+      <el-carousel v-if="bannerList.length>0" :interval="5000" arrow="never" height="180px" :autoplay="false">
+        <el-carousel-item v-for="item in bannerList" :key="item.id">
+          <img :src="item.imageUrl" alt="">
+        </el-carousel-item>
+      </el-carousel>
+      <img :src="exmple" alt="" v-else>
     </div>
+    <div class="icon-manage">
+      <el-row>
+        <el-col :span="6" class="border" v-for="iconItem in iconList" :key="iconItem.id" :class="{'editing-status':showStatus ==iconItem.id}">
+          <div class="grid-content" @click="goChange(iconItem)">
+            <img :src="iconItem.picUrl" alt="" v-if="iconItem.picUrl">
+            <img :src="logo" alt="" v-else> 
+            <p>{{iconItem.name}}</p>
+          </div>
+        </el-col>
+      </el-row>
+    </div>
+    <div class="recommend">
+      <div slot="header" class="card-header clearfix">
+        <span>推荐商家</span>
+      </div>
+      <div class="business-list">
+        <div class="media">
+          <div class="media-left">
+            <a href="#">
+              <img :src="logo" alt="">
+            </a>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">Media heading</h4>
+            信息
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </template>
 <script>
 import exmple from '@/assets/timg.jpeg'
 import logo from '@/assets/logo.png'
-
+import { getBannerList, getIconList } from '@/api/appIndexManage'
+import { mapGetters } from 'vuex'
 export default {
   name: 'preview',
-  props: {
-    bannerlist: {
-      required: true
-    }
+  computed: {
+    ...mapGetters([
+      'updatebannerStatus',
+      'updateiconStatus'
+    ])
   },
   data() {
     return {
       exmple,
-      logo
+      logo,
+      bannerList: [],
+      iconList: [],
+      showStatus: 'banner'
     }
   },
+  watch: {
+    updatebannerStatus() {
+      if (this.updatebannerStatus) {
+        this.getAppbannerList()
+      }
+    },
+    updateiconStatus() {
+      if (this.updateiconStatus) {
+        this.getAppIconList()
+      }
+    }
+  },
+  created() {
+    this.getAppbannerList()
+    this.getAppIconList()
+  },
   methods: {
-    hoverHandle() {
-
+    goChange(states) {
+      if (states === 'banner') {
+        this.showStatus = states
+      } else {
+        this.showStatus = states.id
+      }
+      this.$emit('openStatus', states)
+    },
+    // 预览banner
+    getAppbannerList() {
+      getBannerList().then(response => {
+        this.bannerList = response.data
+        this.$store.commit('SET_BANNERLIST', this.bannerList)
+      })
+    },
+    //  预览宫格
+    getAppIconList() {
+      getIconList().then(response => {
+        this.iconList = response.data
+      })
     }
   }
 }
@@ -145,7 +148,10 @@ export default {
   display: table-cell;
   vertical-align: top;
 }
-.editing-states {
+.border {
+  border: 3px solid #ffffff;
+}
+.editing-status {
   border: 3px solid #4823ee;
   position: relative;
 }

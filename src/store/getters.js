@@ -12,6 +12,10 @@ const getters = {
   superRoleId: state => state.user.superRoleId,
   // 权限
   permission_routers: state => state.permission.routers,
-  addRouters: state => state.permission.addRouters
+  addRouters: state => state.permission.addRouters,
+  // app首页管理
+  bannerlist: state => state.system.bannerlist,
+  updatebannerStatus: state => state.system.updatebannerStatus,
+  updateiconStatus: state => state.system.updateiconStatus
 }
 export default getters
