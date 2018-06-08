@@ -2,7 +2,7 @@
   <div>
     <h3>宫格管理</h3>
     <div class="preview-img">
-      <img :src="updateIcon.imageUrl" class="avatar" v-if="updateIcon.imageUrl">
+      <img :src="updateIcon.picUrl" class="avatar" v-if="updateIcon.picUrl">
       <img :src="logo" class="avatar" v-else>
     </div>
     <div class="avatar-uploader" @click="openPhotos()">
@@ -45,7 +45,7 @@ export default {
   watch: {
     nowIcon() {
       this.updateIcon.id = this.nowIcon.id
-      this.updateIcon.imageUrl = this.nowIcon.picUrl
+      this.updateIcon.picUrl = this.nowIcon.picUrl
     }
   },
   methods: {
@@ -61,7 +61,7 @@ export default {
     // 还原
     returnPhone() {
       console.log(this.nowIcon)
-      this.updateIcon.imageUrl = this.nowIcon.picUrl
+      this.updateIcon.picUrl = this.nowIcon.picUrl
     },
     openPhotos(index) {
       this.isPhotosDialog = true
@@ -78,7 +78,7 @@ export default {
     },
     selectImg(url) {
       this.isPhotosDialog = false
-      this.updateIcon.imageUrl = url
+      this.updateIcon.picUrl = url
     },
     isClose() {
       this.isCloseStatus = true
