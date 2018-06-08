@@ -9,7 +9,7 @@
     </div>
     <div class="app-footer">Footer</div>
 
-    <el-dialog title="修改密码" :visible.sync="IsUpdatepwd" :show-close="false">
+    <el-dialog title="修改密码" @close="isClose" :visible.sync="IsUpdatepwd" :show-close="false">
       <el-form :model="passForm" label-width="100px" :rules="passRules" ref="passForm">
         <el-form-item label="旧密码" prop="oldPass">
           <el-input type="password" v-model="passForm.oldPass" auto-complete="off" placeholder="请输入旧密码"></el-input>
@@ -159,6 +159,13 @@ export default {
           return false
         }
       })
+    },
+    isClose() {
+      this.passForm = {
+        oldPass: '',
+        newPass: '',
+        checkPass: ''
+      }
     }
   }
 }

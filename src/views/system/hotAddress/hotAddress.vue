@@ -33,7 +33,7 @@
       </el-table-column>
     </el-table>
     <!-- 点击增加弹出层 -->
-    <el-dialog title="增加热门地址" :visible.sync="isShowDialog" :show-close="false" width="400px">
+    <el-dialog title="增加热门地址"  @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
       <el-form :model="cityForm" label-width="80px">
         <el-form-item label="城市名" prop="oldPass">
           <el-input type="text" v-model="cityForm.name" auto-complete="off" placeholder="请输入城市名"></el-input>
@@ -183,6 +183,11 @@ export default {
             this.loading = false
           })
         }
+      }
+    },
+    isClose() {
+      this.cityForm = {
+        name: ''
       }
     }
   }

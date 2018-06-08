@@ -18,7 +18,6 @@ service.interceptors.request.use(config => {
   return config
 }, error => {
   // Do something with request error
-  console.log(error) // for debug
   Promise.reject(error)
 })
 
@@ -30,7 +29,6 @@ service.interceptors.response.use(
     */
     const res = response.data
     if (res.code !== '0000') {
-      console.log(res.msg)
       Message({
         message: res.msg,
         type: 'error',

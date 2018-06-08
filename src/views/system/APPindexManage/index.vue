@@ -1,30 +1,52 @@
 <template>
-    <div class="app-container">
-        <el-row :gutter="20">
-            <el-col :span="9">
-                <preview></preview>
-            </el-col>
-            <el-col :span="15">
-                <div class="app-manage">
-                    <banner-manage></banner-manage>
-                </div>
-            </el-col>
-        </el-row>
-    </div>
+  <div class="app-container">
+    <el-row :gutter="20">
+      <el-col :span="9">
+        <preview :bannerlist="bannerList"></preview>
+      </el-col>
+      <el-col :span="15">
+        <div class="app-manage">
+          <banner-manage :bannerlist="bannerList" @updatebanner="updateBanner"></banner-manage>
+          <!-- <icon-manage></icon-manage> -->
+        </div>
+      </el-col>
+    </el-row>
+  </div>
 </template>
 <script>
 import preview from './components/preview'
 import bannerManage from './components/bannerManage'
-
+import iconManage from './components/iconManage'
+import { getBannerList } from '@/api/appIndexManage'
 export default {
   name: 'APPindexManage',
   components: {
     preview,
-    bannerManage
+    bannerManage,
+    iconManage
   },
   data() {
     return {
+      bannerList: [],
+      listLoading: true
 
+    }
+  },
+  created() {
+    this.getAppbannerList()
+  },
+  methods: {
+    updateBanner(boot) {
+      if (boot) {
+        this.getAppbannerList()
+      }
+    },
+    getAppbannerList() {
+      this.listLoading = true
+      getBannerList().then(response => {
+        this.bannerList = response.data
+        this.listLoading = false
+      })
     }
   }
 

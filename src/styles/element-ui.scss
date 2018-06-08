@@ -33,3 +33,7 @@
   height: 7px;
   border-radius: 50%;
 }
+// element-ui隐藏组件scrollbar的使用
+.el-scrollbar__wrap {
+  overflow-x: hidden;
+}

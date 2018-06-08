@@ -33,7 +33,7 @@
       </el-table-column>
     </el-table>
     <!-- 点击增加弹出层 -->
-    <el-dialog title="增加热搜词" :visible.sync="isShowDialog" :show-close="false" width="400px">
+    <el-dialog title="增加热搜词" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
       <el-form :model="wordsForm" label-width="80px">
         <el-form-item label="热搜词" prop="oldPass">
           <el-input type="text" v-model="wordsForm.name" auto-complete="off" placeholder="请输入热搜词"></el-input>
@@ -178,6 +178,11 @@ export default {
             this.loading = false
           })
         }
+      }
+    },
+    isClose() {
+      this.wordsForm = {
+        name: ''
       }
     }
   }

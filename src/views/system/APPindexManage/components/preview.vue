@@ -2,11 +2,12 @@
     <div class="App-carousel">
         <div :mouseenter="hoverHandle" class="editing-states">
             <!-- <el-tag class="editing-button">编辑</el-tag> -->
-            <el-carousel :interval="5000" arrow="never" height="180px" :autoplay="false">
-                <el-carousel-item v-for="item in 4" :key="item">
-                    <img :src="exmple" alt="">
+            <el-carousel v-if="bannerlist.length>0" :interval="5000" arrow="never" height="180px" :autoplay="false">
+                <el-carousel-item v-for="item in bannerlist" :key="item.id">
+                    <img :src="item.imageUrl" alt="">
                 </el-carousel-item>
             </el-carousel>
+            <img :src="exmple" alt="" v-else>
         </div>
         <div class="icon-manage">
             <el-row>
@@ -82,6 +83,11 @@ import logo from '@/assets/logo.png'
 
 export default {
   name: 'preview',
+  props: {
+    bannerlist: {
+      required: true
+    }
+  },
   data() {
     return {
       exmple,
@@ -142,7 +148,6 @@ export default {
 .editing-states {
   border: 3px solid #4823ee;
   position: relative;
-  background: rgba(0, 0, 0, 0.1)
 }
 .editing-button {
   position: absolute;

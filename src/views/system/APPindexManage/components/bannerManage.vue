@@ -1,87 +1,159 @@
 <template>
-    <div>
-        <h3>banner管理</h3>
-        <el-table :data="bannerData" style="width: 100%" empty-text="暂无数据">
-            <el-table-column label="图片地址">
-                <template slot-scope="scope">
-                    <el-upload list-type="picture" action="https://httpbin.org/post">
-                        <div v-if="exmple" class="picture-img">
-                            <el-tag class="tag-button">编辑</el-tag>
-                            <img :src="exmple">
-                        </div>
-                    </el-upload>
-                </template>
-            </el-table-column>
-            <el-table-column label="链接地址">
-                <template slot-scope="scope">
-                    <el-input v-model="scope.row.name" size="small" placeholder="请输入内容" suffix-icon="el-icon-edit"></el-input>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="250px">
-                <template slot-scope="scope">
-                    <div style="text-align:left">
-                        <el-button size="mini" type="success" plain @click="upTr(scope.$index)">上移</el-button>
-                        <el-button size="mini" type="success" plain @click="downTr(scope.$index)">下移</el-button>
-                        <el-button size="mini" type="danger" plain @click="deleteBanner(scope.$index)">删除</el-button>
-                    </div>
-                </template>
-            </el-table-column>
-        </el-table>
-        <div class="add-button">
-            <el-button @click="addBanner" size="small" type="primary" plain>添加</el-button>
-        </div>
-        <div class="save-button">
-            <el-button type="primary" @click="onSave">保存预览</el-button>
-        </div>
+  <div>
+    <h3>banner管理</h3>
+    <el-table :data="bannerUpdateList" style="width: 100%" empty-text="暂无数据">
+      <el-table-column label="图片地址">
+        <template slot-scope="scope">
+          <div class="picture-img" @click="openImgs(scope.$index)">
+            <el-tag class="tag-button">编辑</el-tag>
+            <img :src="scope.row.imageUrl">
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="链接地址">
+        <template slot-scope="scope">
+          <el-input v-model="scope.row.linkUrl" size="small" placeholder="请输入内容" suffix-icon="el-icon-edit"></el-input>
+        </template>
+      </el-table-column>
+      <el-table-column label="操作" width="250px">
+        <template slot-scope="scope">
+          <div style="text-align:left">
+            <el-button size="mini" type="success" plain @click="upTr(scope.$index)">上移</el-button>
+            <el-button size="mini" type="success" plain @click="downTr(scope.$index)">下移</el-button>
+            <el-button size="mini" type="danger" plain @click="deleteBanner(scope.$index)">删除</el-button>
+          </div>
+        </template>
+      </el-table-column>
+    </el-table>
+    <div class="add-button">
+      <el-button @click="addBanner" size="small" type="primary" plain>添加</el-button>
+      <span v-if="tipShow">最多只能添加5组</span>
     </div>
+    <div class="save-button">
+      <el-button type="primary" @click="onSave">保存</el-button>
+    </div>
+    <!-- 图片弹出层 -->
+    <el-dialog title="图片库" :visible.sync="isImgDialog" @close="isClose" @open="isOpen">
+      <photo-album :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
+    </el-dialog>
+
+  </div>
 </template>
 <script>
 import exmple from '@/assets/timg.jpeg'
+import PhotoAlbum from '@/components/PhotoAlbum'
+import { getBannerPic, saveBanner } from '@/api/picManage'
 export default {
-  name: 'home',
+  name: 'bannerManage',
+  components: {
+    PhotoAlbum
+  },
+  props: {
+    bannerlist: {
+      required: true
+    }
+  },
   data() {
     return {
       exmple,
-      bannerData: [{
-        date: '',
-        name: '1',
-        address: ''
-      },
-      {
-        date: '',
-        name: '2',
-        address: ''
-      }]
+      isImgDialog: false,
+      tipShow: false,
+      backgroundDiv: {},
+      picList: [],
+      isCloseStatus: false,
+      selectEditIndex: Number
+    }
+  },
+  computed: {
+    bannerUpdateList() {
+      var arr = []
+      this.bannerlist.forEach(item => {
+        arr.push(
+          {
+            'imageUrl': item.imageUrl,
+            'linkUrl': item.linkUrl
+          }
+        )
+      })
+      return arr
     }
   },
   methods: {
+    onSave() {
+      this.bannerUpdateList.forEach((item, index) => {
+        this.$set(item, 'id', index)
+      })
+      saveBanner(this.bannerUpdateList).then(response => {
+        this.$message({
+          type: 'success',
+          message: '保存成功!'
+        })
+        this.$emit('updatebanner', true)
+      })
+    },
+    selectImg(url) {
+      this.isImgDialog = false
+      this.bannerUpdateList[this.selectEditIndex].imageUrl = url
+    },
+    isClose() {
+      this.isCloseStatus = true
+    },
+    isOpen() {
+      this.isCloseStatus = false
+    },
+    updateData(boot) {
+      if (boot) {
+        this.getPicList()
+      }
+    },
+    // 图片管理
+    handleRemove(file, fileList) {
+      console.log(file, fileList)
+    },
+    // 加载图片库
+    getPicList() {
+      this.listLoading = true
+      getBannerPic().then(response => {
+        var data = response.data
+        this.picList = data.reverse()
+        this.listLoading = false
+      })
+    },
+    // banner管理操作
+    openImgs(index) {
+      this.selectEditIndex = index
+      this.isImgDialog = true
+      this.getPicList()
+    },
     addBanner() {
-      this.bannerData.push(
-        {
-          date: '',
-          name: '',
-          address: ''
-        }
-      )
+      var length = this.bannerUpdateList.length
+      if (length > 5) {
+        this.tipShow = true
+      } else {
+        this.bannerUpdateList.push(
+          {
+            imageUrl: exmple,
+            linkUrl: ''
+          }
+        )
+      }
     },
     deleteBanner(index) {
-      this.bannerData.splice(index, 1)
+      this.bannerUpdateList.splice(index, 1)
     },
     upTr(index) {
       if (index === 0) {
         return
       }
-      this.bannerData[index] = this.bannerData.splice(index - 1, 1, this.bannerData[index])[0]
+      this.bannerUpdateList[index] = this.bannerUpdateList.splice(index - 1, 1, this.bannerUpdateList[index])[0]
     },
     downTr(index) {
-      if (index === this.bannerData.length - 1) {
+      if (index === this.bannerUpdateList.length - 1) {
         return
       }
-      this.bannerData[index] = this.bannerData.splice(index + 1, 1, this.bannerData[index])[0]
-    },
-    onSave() {
-
+      this.bannerUpdateList[index] = this.bannerUpdateList.splice(index + 1, 1, this.bannerUpdateList[index])[0]
     }
+
   }
 }
 </script>
@@ -89,6 +161,7 @@ export default {
 <style scoped lang="scss">
 .picture-img {
   position: relative;
+  cursor: pointer;
 }
 .picture-img .tag-button {
   position: absolute;
@@ -96,7 +169,7 @@ export default {
   //   left: 50%;
   //   transform: translate(-50%, -50%);˝
   bottom: 0;
-  right: 0;
+  left: 0;
   background-color: rgba(255, 255, 255, 0.8);
 }
 .picture-img img {
