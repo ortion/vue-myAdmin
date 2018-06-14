@@ -23,17 +23,17 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <div style="text-align:left">
-            <el-button v-if="scope.row.edit" size="mini" type="danger" plain @click="updateAddress(scope.row)">保存</el-button>
+            <el-button v-if="scope.row.edit" :loading="loading" size="mini" type="danger" plain @click="updateAddress(scope.row)">保存</el-button>
             <el-button v-else type="primary" size="mini" plain @click='scope.row.edit=!scope.row.edit'>修改</el-button>
-            <el-button size="mini" type="success" plain @click="moveAddress(scope.row,'up')">上移</el-button>
-            <el-button size="mini" type="success" plain @click="moveAddress(scope.row,'down')">下移</el-button>
+            <el-button :disabled="scope.row.id==1" size="mini" type="success" plain @click="moveAddress(scope.row,'up')">上移</el-button>
+            <el-button :disabled="scope.row.id==list.length" size="mini" type="success" plain @click="moveAddress(scope.row,'down')">下移</el-button>
             <el-button size="mini" type="danger" plain @click="deleteAddress(scope.row)">删除</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
     <!-- 点击增加弹出层 -->
-    <el-dialog title="增加热门地址"  @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
+    <el-dialog title="增加热门地址" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
       <el-form :model="cityForm" label-width="80px">
         <el-form-item label="城市名" prop="oldPass">
           <el-input type="text" v-model="cityForm.name" auto-complete="off" placeholder="请输入城市名"></el-input>
@@ -47,15 +47,15 @@
   </div>
 </template>
 <script>
-import { getHCityList, addHCity, updateHCity, deleteHCity, upMoveHCity, downMoveHCity } from '@/api/hotManage'
+import { getHCityList, addHCity, updateHCity, deleteHCity, upMoveHCity, downMoveHCity } from '@/api/system/hotManage'
 export default {
   name: 'hotAddress',
   data() {
     return {
       list: null,
       listLoading: true,
-      isShowDialog: false,
       loading: false,
+      isShowDialog: false,
       cityForm: {
         name: '',
         id: ''
@@ -69,11 +69,15 @@ export default {
     getHotCityList() {
       this.listLoading = true
       getHCityList().then(response => {
-        const items = response.data
-        this.list = items.map(v => {
-          this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-          return v
-        })
+        if (response.data) {
+          const items = response.data
+          this.list = items.map(v => {
+            this.$set(v, 'edit', false)
+            return v
+          })
+        } else {
+          this.list = []
+        }
         this.listLoading = false
       })
     },
@@ -87,6 +91,7 @@ export default {
       }
     },
     submitCitys() {
+      this.cityForm.name = this.cityForm.name.trim()
       if (this.cityForm.name) {
         this.loading = true
         addHCity(this.cityForm.name).then(() => {
@@ -98,20 +103,25 @@ export default {
           this.isShowDialog = false
           this.getHotCityList()
         }).catch(err => {
-          console.log(err)
           this.$message({
             message: err,
             type: 'error'
           })
           this.loading = false
         })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '地址不能为空'
+        })
       }
     },
     updateAddress(row) {
-      if (row.cityName) {
+      const name = row.cityName.trim()
+      if (name) {
         this.loading = true
         this.cityForm.id = row.cityId
-        this.cityForm.name = row.cityName
+        this.cityForm.name = name
         updateHCity(this.cityForm).then(() => {
           this.loading = false
           this.$message({
@@ -123,31 +133,31 @@ export default {
             name: ''
           }
         }).catch(err => {
-          console.log(err)
           this.$message({
             message: err,
             type: 'error'
           })
           this.loading = false
         })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '地址不能为空'
+        })
       }
     },
     deleteAddress(row) {
-      this.loading = true
       deleteHCity(row.cityId).then(() => {
-        this.loading = false
         this.$message({
           message: '删除地址成功',
           type: 'success'
         })
         this.getHotCityList()
       }).catch(err => {
-        console.log(err)
         this.$message({
           message: err,
           type: 'error'
         })
-        this.loading = false
       })
     },
     moveAddress(row, status) {
@@ -156,15 +166,12 @@ export default {
           return
         } else {
           upMoveHCity(row.cityId).then(() => {
-            this.loading = false
             this.getHotCityList()
           }).catch(err => {
-            console.log(err)
             this.$message({
               message: err,
               type: 'error'
             })
-            this.loading = false
           })
         }
       } else if (status === 'down') {
@@ -172,15 +179,12 @@ export default {
           return
         } else {
           downMoveHCity(row.cityId).then(() => {
-            this.loading = false
             this.getHotCityList()
           }).catch(err => {
-            console.log(err)
             this.$message({
               message: err,
               type: 'error'
             })
-            this.loading = false
           })
         }
       }

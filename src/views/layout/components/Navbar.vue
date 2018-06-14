@@ -36,8 +36,7 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .navbar {
-  position: fixed;
-  top: 50px;
+  margin-top: 4px;
   height: 50px;
   line-height: 50px;
   width: 100%;

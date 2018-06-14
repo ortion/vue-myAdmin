@@ -45,7 +45,28 @@ export const constantRouterMap = [
       component: () => import('@/views/system/rolesManage/rolesAdd'),
       meta: { title: '权限管理' }
     }]
-
+  },
+  {
+    path: '/company',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'shopManage/shopAdd',
+      name: 'shopAdd',
+      component: () => import('@/views/company/shopManage/shopAdd'),
+      meta: { title: '新建门店' }
+    }]
+  },
+  {
+    path: '/company',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'companyManage/companyAdd',
+      name: 'companyAdd',
+      component: () => import('@/views/company/companyManage/companyAdd'),
+      meta: { title: '新建企业' }
+    }]
   }
 
 ]
@@ -72,7 +93,14 @@ export const asyncRouterMap = [
         meta: { title: '企业管理', index: '2-1' }
       },
       {
-        //  企业管理
+        //  企业类型管理
+        path: 'companyType',
+        name: 'companyType',
+        component: () => import('@/views/company/companyType/companyType'),
+        meta: { title: '企业类型管理', index: '2-9' }
+      },
+      {
+        //  门店管理
         path: 'shopManage',
         name: 'shopManage',
         component: () => import('@/views/company/shopManage/shopManage'),
@@ -149,37 +177,7 @@ export const asyncRouterMap = [
       }
 
     ]
-  }
-  // {
-  //   path: '/example',
-  //   component: Layout,
-  //   redirect: '/example/table',
-  //   name: 'Example',
+  },
 
-  //   meta: { title: 'Example', icon: 'example', index: '2' },
-  //   children: [
-  //     {
-  //       path: 'table',
-  //       name: 'Table',
-
-  //       component: () => import('@/views/table/index'),
-  //       meta: { title: 'Table', icon: 'table', index: '2-1' }
-  //     },
-  //     {
-  //       path: 'tree',
-  //       name: 'Tree',
-
-  //       component: () => import('@/views/tree/index'),
-  //       meta: { title: 'Tree', icon: 'tree', index: '2-2' }
-  //     },
-  //     {
-  //       path: 'form',
-  //       name: 'Form',
-
-  //       component: () => import('@/views/form/index'),
-  //       meta: { title: 'form', icon: 'form', index: '2-3' }
-  //     }
-  //   ]
-  // }
-  // { path: '*', redirect: '/404', hidden: true }
+  { path: '*', redirect: '/404', hidden: true }
 ]

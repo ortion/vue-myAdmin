@@ -2,9 +2,9 @@
   <div class="app-container">
     <div class="filter-container">
       <h3>权限管理</h3>
-       <div style="text-align:right">
-      <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
-       </div>
+      <div style="text-align:right">
+        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
+      </div>
     </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row empty-text="暂无数据">
       <el-table-column align="center" label='序号'>
@@ -36,7 +36,7 @@
 </template>
 <script>
 import { mapGetters } from 'vuex'
-import { getRoleList, deleteRoles } from '@/api/rolesManage'
+import { getRoleList, deleteRoles } from '@/api/system/rolesManage'
 export default {
   name: 'rolesList',
   computed: {
@@ -57,7 +57,11 @@ export default {
     fetchData() {
       this.listLoading = true
       getRoleList().then(response => {
-        this.list = response.data
+        if (response.data) {
+          this.list = response.data
+        } else {
+          this.list = []
+        }
         this.listLoading = false
       })
     },
@@ -68,7 +72,6 @@ export default {
       this.$router.push({ name: 'rolesAdd', query: { roleId: row.roleId }})
     },
     deleteRoles(row) {
-      console.log(row)
       this.$confirm('是否确定删除角色:' + row.roleName, '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',

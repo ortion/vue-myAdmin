@@ -208,6 +208,24 @@ const PermissionList = [
             'title': '强制下架/发布'
           }
         ]
+      },
+      {
+        'authSign': '2-9',
+        'title': '企业类型管理',
+        'children': [
+          {
+            'authSign': '2-9-1',
+            'title': '新增'
+          },
+          {
+            'authSign': '2-9-2',
+            'title': '修改'
+          },
+          {
+            'authSign': '2-9-3',
+            'title': '删除'
+          }
+        ]
       }
     ]
   },

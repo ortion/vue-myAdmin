@@ -1,14 +1,20 @@
 <template>
-  <div class="app-wrapper" :class="classObj">
+  <el-container class="app-wrapper" :class="classObj">
     <!-- <div v-if="device==='mobile'&&sidebar.opened" class="drawer-bg" @click="handleClickOutside"></div> -->
     <sidebar class="sidebar-container"></sidebar>
-    <app-header @changeStatus="changeStatus">header</app-header>
-    <div class="main-container">
-      <navbar></navbar>
-      <app-main></app-main>
-    </div>
-    <div class="app-footer">Footer</div>
-
+    <el-header class="app-header">
+      <app-header @changeStatus="changeStatus">header</app-header>
+    </el-header>
+    <el-container class="main-container">
+      <el-header style="height:50px">
+        <navbar></navbar>
+      </el-header>
+      <el-main class="main">
+        <app-main></app-main>
+        <div class="app-footer">Footer</div>
+      </el-main>
+    </el-container>
+    <!-- 弹出层 -->
     <el-dialog title="修改密码" @close="isClose" :visible.sync="IsUpdatepwd" :show-close="false">
       <el-form :model="passForm" label-width="100px" :rules="passRules" ref="passForm">
         <el-form-item label="旧密码" prop="oldPass">
@@ -33,9 +39,7 @@
         <li>用户姓名：{{realName}}</li>
       </ul>
     </el-dialog>
-  </div>
-
-  </div>
+  </el-container>
 </template>
 <script>
 import { Navbar, Sidebar, AppMain, AppHeader } from './components'
@@ -194,8 +198,4 @@ body {
   z-index: 999;
 }
 
-.app-footer {
-  padding: 0;
-  margin-left: 180px;
-}
 </style>

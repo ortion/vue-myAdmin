@@ -44,7 +44,7 @@
 <script>
 import exmple from '@/assets/timg.jpeg'
 import logo from '@/assets/logo.png'
-import { getBannerList, getIconList } from '@/api/appIndexManage'
+import { getBannerList, getIconList } from '@/api/system/appIndexManage'
 import { mapGetters } from 'vuex'
 export default {
   name: 'preview',

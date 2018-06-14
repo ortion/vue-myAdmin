@@ -5,15 +5,15 @@
       <img :src="updateIcon.picUrl" class="avatar" v-if="updateIcon.picUrl">
       <img :src="logo" class="avatar" v-else>
     </div>
-    <div class="avatar-uploader" @click="openPhotos()">
+    <div class="avatar-uploader" @click="openPhotos">
       <i class="el-icon-plus avatar-uploader-icon"></i>
     </div>
     <div class="submit-button">
-      <el-button type="info" plain @click="returnPhone()">还原</el-button>
-      <el-button type="primary" @click="onSave">确认</el-button>
+      <el-button type="info" plain @click="returnPhone">还原</el-button>
+      <el-button type="primary" @click="onSave" :loading="loading">确认</el-button>
     </div>
     <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isClose" @open="isOpen">
-      <photo-album :photoType="'icon'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
+      <photo-album :photoType="'icon'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus" :listLoading="listLoading"></photo-album>
 
     </el-dialog>
   </div>
@@ -22,7 +22,7 @@
 import logo from '@/assets/logo.png'
 import PhotoAlbum from '@/components/PhotoAlbum'
 import { getIconPic } from '@/api/picManage'
-import { addIcon } from '@/api/appIndexManage'
+import { addIcon } from '@/api/system/appIndexManage'
 export default {
   name: 'iconManage',
   components: {
@@ -32,13 +32,15 @@ export default {
   data() {
     return {
       logo,
+      loading: false,
+      listLoading: false,
       imageUrl: '',
       isPhotosDialog: false,
       picList: [],
       isCloseStatus: false,
       updateIcon: {
         id: '',
-        imageUrl: ''
+        picUrl: ''
       }
     }
   },
@@ -50,20 +52,23 @@ export default {
   },
   methods: {
     onSave() {
+      this.loading = true
       addIcon(this.updateIcon).then(response => {
+        this.loading = false
         this.$message({
           type: 'success',
           message: '保存成功!'
         })
         this.$store.commit('UPDATEICON_STATUS', true)
+      }).catch(() => {
+        this.loading = false
       })
     },
     // 还原
     returnPhone() {
-      console.log(this.nowIcon)
       this.updateIcon.picUrl = this.nowIcon.picUrl
     },
-    openPhotos(index) {
+    openPhotos() {
       this.isPhotosDialog = true
       this.getPicList()
     },

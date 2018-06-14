@@ -23,10 +23,10 @@
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <div style="text-align:left">
-            <el-button v-if="scope.row.edit" size="mini" type="danger" plain @click="updateWords(scope.row)">保存</el-button>
+            <el-button v-if="scope.row.edit" :loading="loading" size="mini" type="danger" plain @click="updateWords(scope.row)">保存</el-button>
             <el-button v-else type="primary" size="mini" plain @click='scope.row.edit=!scope.row.edit'>修改</el-button>
-            <el-button size="mini" type="success" plain @click="moveWords(scope.row,'up')">上移</el-button>
-            <el-button size="mini" type="success" plain @click="moveWords(scope.row,'down')">下移</el-button>
+            <el-button :disabled="scope.row.id==1" size="mini" type="success" plain @click="moveWords(scope.row,'up')">上移</el-button>
+            <el-button :disabled="scope.row.id==list.length" size="mini" type="success" plain @click="moveWords(scope.row,'down')">下移</el-button>
             <el-button size="mini" type="danger" plain @click="deleteWords(scope.row)">删除</el-button>
           </div>
         </template>
@@ -47,19 +47,20 @@
   </div>
 </template>
 <script>
-import { getWordsList, addWords, deleteWords, updateWords, upMoveWords, downMoveWords } from '@/api/hotManage'
+import { getWordsList, addWords, deleteWords, updateWords, upMoveWords, downMoveWords } from '@/api/system/hotManage'
 export default {
   name: 'hotKeyword',
   data() {
     return {
       list: null,
       listLoading: true,
-      isShowDialog: false,
       loading: false,
+      isShowDialog: false,
       wordsForm: {
         name: '',
         id: ''
       }
+
     }
   },
   created() {
@@ -69,11 +70,15 @@ export default {
     gethotKwordsList() {
       this.listLoading = true
       getWordsList().then(response => {
-        const items = response.data
-        this.list = items.map(v => {
-          this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
-          return v
-        })
+        if (response.data) {
+          const items = response.data
+          this.list = items.map(v => {
+            this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
+            return v
+          })
+        } else {
+          this.list = []
+        }
         this.listLoading = false
       })
     },
@@ -87,6 +92,7 @@ export default {
       }
     },
     submitWords() {
+      this.wordsForm.name = this.wordsForm.name.trim()
       if (this.wordsForm.name) {
         this.loading = true
         addWords(this.wordsForm.name).then(() => {
@@ -100,17 +106,23 @@ export default {
         }).catch(() => {
           this.loading = false
         })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '热搜词不能为空'
+        })
       }
     },
     updateWords(row) {
-      if (row.wordText) {
+      const text = row.wordText.trim()
+      if (text) {
         this.loading = true
         this.wordsForm.id = row.wordId
-        this.wordsForm.name = row.wordText
+        this.wordsForm.name = text
         updateWords(this.wordsForm).then(() => {
           this.loading = false
           this.$message({
-            message: '修改地址成功',
+            message: '修改成功',
             type: 'success'
           })
           row.edit = false
@@ -118,31 +130,31 @@ export default {
             name: ''
           }
         }).catch(err => {
-          console.log(err)
+          this.loading = false
           this.$message({
             message: err,
             type: 'error'
           })
-          this.loading = false
+        })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '热搜词不能为空'
         })
       }
     },
     deleteWords(row) {
-      this.loading = true
       deleteWords(row.wordId).then(() => {
-        this.loading = false
         this.$message({
-          message: '删除地址成功',
+          message: '删除成功',
           type: 'success'
         })
         this.gethotKwordsList()
       }).catch(err => {
-        console.log(err)
         this.$message({
           message: err,
           type: 'error'
         })
-        this.loading = false
       })
     },
     moveWords(row, status) {
@@ -151,15 +163,12 @@ export default {
           return
         } else {
           upMoveWords(row.wordId).then(() => {
-            this.loading = false
             this.gethotKwordsList()
           }).catch(err => {
-            console.log(err)
             this.$message({
               message: err,
               type: 'error'
             })
-            this.loading = false
           })
         }
       } else if (status === 'down') {
@@ -167,15 +176,12 @@ export default {
           return
         } else {
           downMoveWords(row.wordId).then(() => {
-            this.loading = false
             this.gethotKwordsList()
           }).catch(err => {
-            console.log(err)
             this.$message({
               message: err,
               type: 'error'
             })
-            this.loading = false
           })
         }
       }

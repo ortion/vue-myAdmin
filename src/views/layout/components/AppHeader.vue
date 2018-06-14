@@ -90,19 +90,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .header-wrapper {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 100;
-  height: 50px;
-  padding: 0 12px 0 0;
-  background: #fff;
-  -webkit-box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
-  box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+  padding: 0 10px;
 }
-
 .logo-container {
-  line-height: 50px;
+  padding: 7px 0;
   min-width: 400px;
   .logo {
     width: 45px;
@@ -118,8 +109,7 @@ export default {
 }
 .userinfo {
   text-align: right;
-  float: right;
-  padding: 15px 0;
+  padding: 20px 0;
 }
 .avatar {
   width: 40px;

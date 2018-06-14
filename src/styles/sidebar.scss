@@ -1,7 +1,7 @@
 #app {
   // 主体区域
   .main-container {
-    min-height: 100%;
+    // min-height: 100%;
     transition: margin-left .28s;
     margin-left: 180px;
   }
@@ -17,7 +17,7 @@
     left: 0;
     z-index:88;
     overflow: hidden;
-    padding-top: 50px;
+    padding-top: 60px;
     //reset element-ui css
     .horizontal-collapse-transition {
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;

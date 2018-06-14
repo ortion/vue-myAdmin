@@ -1,11 +1,12 @@
 <template>
-  <div>
+  <div v-loading.body="listLoading">
     <div class="nodata" v-if="photoList.length<=0">
       暂无图片
     </div>
     <div class="photoGallery" v-else>
-      <el-scrollbar wrapClass="photo-scrollbar" style="height:100%;">
-        <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
+      <el-scrollbar style="height:100%;">
+        <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" 
+        class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
           <div class="photoGallery-operate">
             <i class="el-icon-success" v-if="!isDeleteStatus&&(index==isIndex)"></i>
             <el-checkbox-group v-model="checkedImg" @change="handleChange" v-if="isDeleteStatus">
@@ -34,7 +35,7 @@
 </template>
 
 <script>
-import { uploadBannerPic, deleteBannerPic, uploadIconPic, deleteIconPic } from '@/api/picManage'
+import { uploadBannerPic, deleteBannerPic, uploadIconPic, deleteIconPic, uploadShopPic, deleteShopPic } from '@/api/picManage'
 import { client } from '@/utils/alioss'
 export default {
   props: ['photoType', 'photoList', 'closeDialog'],
@@ -50,6 +51,7 @@ export default {
   },
   data() {
     return {
+      listLoading: false,
       fileList: [],
       checkedImg: [],
       isDeleteStatus: false,
@@ -96,6 +98,10 @@ export default {
           uploadIconPic(this.fileList).then(res => {
             this.$emit('updatedata', true)
           })
+        } else if (this.photoType === 'shop') {
+          uploadShopPic(this.fileList).then(res => {
+            this.$emit('updatedata', true)
+          })
         }
       }).catch(err => {
         console.log(err)
@@ -134,6 +140,15 @@ export default {
             this.checkedImg = []
             this.$emit('updatedata', true)
           })
+        } else if (this.photoType === 'shop') {
+          deleteShopPic(imgList).then(res => {
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
+            this.checkedImg = []
+            this.$emit('updatedata', true)
+          })
         }
       } else {
         this.$message({
@@ -152,7 +167,7 @@ export default {
 <style scoped lang="scss">
 /* 图片库 */
 .photoGallery {
-  height: 400px;
+  height: 350px;
   margin-bottom: 15px;
 }
 .photoGallery-item {

@@ -18,23 +18,23 @@
       <el-table-column label="操作" width="250px">
         <template slot-scope="scope">
           <div style="text-align:left">
-            <el-button size="mini" type="success" plain @click="upTr(scope.$index)">上移</el-button>
-            <el-button size="mini" type="success" plain @click="downTr(scope.$index)">下移</el-button>
+            <el-button size="mini" :disabled="scope.$index==0" type="success" plain @click="upTr(scope.$index)">上移</el-button>
+            <el-button size="mini" :disabled="scope.$index==bannerUpdateList.length-1" type="success" plain @click="downTr(scope.$index)">下移</el-button>
             <el-button size="mini" type="danger" plain @click="deleteBanner(scope.$index)">删除</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
     <div class="add-button">
-      <el-button @click="addBanner" size="small" type="primary" plain>添加</el-button>
-      <span v-if="tipShow">最多只能添加5组</span>
+      <el-button @click="addBanner" :disabled="this.bannerUpdateList.length>5" size="small" type="primary" plain>添加</el-button>
+      <span class="tipMessage">(最多只能添加6组)</span>
     </div>
     <div class="save-button">
-      <el-button type="primary" @click="onSave">保存</el-button>
+      <el-button type="primary" @click="onSave" :loading="loading">保存</el-button>
     </div>
     <!-- 图片弹出层 -->
     <el-dialog title="图片库" :visible.sync="isImgDialog" @close="isClose" @open="isOpen">
-      <photo-album :photoType="'banner'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus"></photo-album>
+      <photo-album :photoType="'banner'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus" :listLoading="listLoading"></photo-album>
     </el-dialog>
 
   </div>
@@ -43,7 +43,7 @@
 import exmple from '@/assets/timg.jpeg'
 import PhotoAlbum from '@/components/PhotoAlbum'
 import { getBannerPic } from '@/api/picManage'
-import { addBanner } from '@/api/appIndexManage'
+import { addBanner } from '@/api/system/appIndexManage'
 import { mapGetters } from 'vuex'
 export default {
   name: 'bannerManage',
@@ -58,8 +58,9 @@ export default {
   data() {
     return {
       exmple,
+      loading: false,
+      listLoading: false,
       isImgDialog: false,
-      tipShow: false,
       bannerUpdateList: [],
       backgroundDiv: {},
       picList: [],
@@ -82,18 +83,28 @@ export default {
     }
   },
   methods: {
-
     onSave() {
-      this.bannerUpdateList.forEach((item, index) => {
-        this.$set(item, 'id', index)
-      })
-      addBanner(this.bannerUpdateList).then(response => {
-        this.$message({
-          type: 'success',
-          message: '保存成功!'
+      if (this.bannerUpdateList.length > 0) {
+        this.loading = true
+        this.bannerUpdateList.forEach((item, index) => {
+          this.$set(item, 'id', index)
         })
-        this.$store.commit('UPDATEBANNER_STATUS', true)
-      })
+        addBanner(this.bannerUpdateList).then(response => {
+          this.loading = false
+          this.$message({
+            type: 'success',
+            message: '保存成功!'
+          })
+          this.$store.commit('UPDATEBANNER_STATUS', true)
+        }).catch(() => {
+          this.loading = false
+        })
+      } else {
+        this.$message({
+          type: 'warning',
+          message: '您未添加banner图!'
+        })
+      }
     },
     selectImg(url) {
       this.isImgDialog = false
@@ -109,10 +120,6 @@ export default {
       if (boot) {
         this.getPicList()
       }
-    },
-    // 图片管理
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
     },
     // 加载图片库
     getPicList() {
@@ -131,16 +138,13 @@ export default {
     },
     addBanner() {
       var length = this.bannerUpdateList.length
-      if (length > 5) {
-        this.tipShow = true
-      } else {
-        this.bannerUpdateList.push(
-          {
-            imageUrl: exmple,
-            linkUrl: ''
-          }
-        )
-      }
+      if (length > 5) return
+      this.bannerUpdateList.push(
+        {
+          imageUrl: exmple,
+          linkUrl: ''
+        }
+      )
     },
     deleteBanner(index) {
       this.bannerUpdateList.splice(index, 1)

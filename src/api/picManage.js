@@ -72,3 +72,35 @@ export function deleteIconPic(data) {
     }
   })
 }
+// 门店管理
+export function getShopPic() {
+  return request({
+    url: 'base/picload',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'type': 6
+    }
+  })
+}
+export function uploadShopPic(data) {
+  return request({
+    url: 'base/picupload',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'type': 6,
+      'picList': data
+    }
+  })
+}
+export function deleteShopPic(data) {
+  return request({
+    url: 'base/picdelete',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'picList': data
+    }
+  })
+}

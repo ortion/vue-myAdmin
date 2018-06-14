@@ -15,8 +15,8 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onUpdate" v-if="roleId">修改</el-button>
-        <el-button type="primary" @click="onSave" v-else>保存</el-button>
+        <el-button type="primary" :loading="loading" @click="onUpdate" v-if="roleId">修改</el-button>
+        <el-button type="primary" :loading="loading" @click="onSave" v-else>保存</el-button>
         <!-- <el-button @click="onCancel">取消</el-button> -->
       </el-form-item>
     </el-form>
@@ -25,7 +25,7 @@
 
 <script>
 import PermissionTree from './components/PermissionTree'
-import { loadRolesUpate, loadRoles, addRoles, updateRoles } from '@/api/rolesManage'
+import { loadRolesUpate, loadRoles, addRoles, updateRoles } from '@/api/system/rolesManage'
 export default {
   name: 'rolesAdd',
   components: { PermissionTree },
@@ -39,7 +39,9 @@ export default {
       },
       dataList: [],
       merchantList: [],
-      listLoading: true
+      listLoading: true,
+      // 防止重复提交
+      loading: false
     }
   },
   computed: {
@@ -79,30 +81,39 @@ export default {
       })
     },
     onSave() {
+      this.roleForm.roleName = this.roleForm.roleName.trim()
       if (this.roleForm.roleName && this.roleForm.merchant && (this.roleForm.checkedID.length > 0)) {
+        this.loading = true
         addRoles(this.roleForm).then(
           response => {
+            this.loading = false
             this.$message({
               type: 'success',
               message: '保存成功!'
             })
             this.$router.push({ name: 'rolesList' })
           }
-        )
+        ).catch(() => {
+          this.loading = false
+        })
       } else { this.$message('不可以为空') }
     },
     onUpdate() {
-      console.log(this.roleForm)
+      this.roleForm.roleName = this.roleForm.roleName.trim()
       if (this.roleForm.roleName && this.roleForm.merchant && (this.roleForm.checkedID.length > 0)) {
+        this.loading = true
         updateRoles(this.roleId, this.roleForm).then(
           response => {
+            this.loading = false
             this.$message({
               type: 'success',
-              message: '保存成功!'
+              message: '修改成功!'
             })
             this.$router.push({ name: 'rolesList' })
           }
-        )
+        ).catch(() => {
+          this.loading = false
+        })
       } else { this.$message('不可以为空') }
     }
   }
