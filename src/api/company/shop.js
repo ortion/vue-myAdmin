@@ -1,9 +1,9 @@
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
-// 企业类别
-export function getCompanyType() {
+// 门店列表查询
+export function getShops() {
   return request({
-    url: 'company/list',
+    url: 'shop/list',
     method: 'POST',
     data: {
       'token': getToken()
@@ -22,6 +22,7 @@ export function addShop(data) {
       'name': data.shopname,
       'shopType': data.shopType,
       'introdcution': data.introdcution,
+      'province': data.provinceId,
       'city': data.cityId,
       'town': data.districtId,
       'address': data.address,

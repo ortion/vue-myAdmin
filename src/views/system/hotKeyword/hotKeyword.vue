@@ -6,7 +6,7 @@
         <el-button class="filter-item" style="margin-left: 10px;" @click="addWords" type="primary" icon="el-icon-edit">增加</el-button>
       </div>
     </div>
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row empty-text="暂无数据">
+    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column align="center" label='序号'>
         <template slot-scope="scope">
           {{scope.$index+1}}
@@ -15,7 +15,8 @@
       <el-table-column label="热搜词" align="center">
         <template slot-scope="scope">
           <template v-if="scope.row.edit">
-            <el-input class="edit-input" size="small" v-model="scope.row.wordText"></el-input>
+            <el-input class="edit-input" size="small" v-model.trim="scope.row.wordText"></el-input>
+            <el-button class='cancel-btn' size="small" type="warning" @click="cancelEdit(scope.row)">取消</el-button>
           </template>
           <span v-else>{{ scope.row.wordText }}</span>
         </template>
@@ -36,7 +37,7 @@
     <el-dialog title="增加热搜词" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
       <el-form :model="wordsForm" label-width="80px">
         <el-form-item label="热搜词" prop="oldPass">
-          <el-input type="text" v-model="wordsForm.name" auto-complete="off" placeholder="请输入热搜词"></el-input>
+          <el-input v-model.trim="wordsForm.name" auto-complete="off" placeholder="请输入热搜词"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button @click="cancelDialog">取消</el-button>
@@ -67,18 +68,28 @@ export default {
     this.gethotKwordsList()
   },
   methods: {
+    cancelEdit(row) {
+      row.wordText = row.originalTitle
+      row.edit = false
+      this.wordsForm = {
+        name: ''
+      }
+    },
     gethotKwordsList() {
       this.listLoading = true
       getWordsList().then(response => {
         if (response.data) {
           const items = response.data
           this.list = items.map(v => {
-            this.$set(v, 'edit', false) // https://vuejs.org/v2/guide/reactivity.html
+            this.$set(v, 'edit', false)
+            v.originalTitle = v.wordText
             return v
           })
         } else {
           this.list = []
         }
+        this.listLoading = false
+      }).catch(() => {
         this.listLoading = false
       })
     },
@@ -92,7 +103,6 @@ export default {
       }
     },
     submitWords() {
-      this.wordsForm.name = this.wordsForm.name.trim()
       if (this.wordsForm.name) {
         this.loading = true
         addWords(this.wordsForm.name).then(() => {
@@ -114,11 +124,11 @@ export default {
       }
     },
     updateWords(row) {
-      const text = row.wordText.trim()
-      if (text) {
+      if (row.wordText) {
         this.loading = true
+        row.originalTitle = row.wordText
         this.wordsForm.id = row.wordId
-        this.wordsForm.name = text
+        this.wordsForm.name = row.wordText
         updateWords(this.wordsForm).then(() => {
           this.loading = false
           this.$message({
@@ -129,12 +139,8 @@ export default {
           this.wordsForm = {
             name: ''
           }
-        }).catch(err => {
+        }).catch(() => {
           this.loading = false
-          this.$message({
-            message: err,
-            type: 'error'
-          })
         })
       } else {
         this.$message({
@@ -150,11 +156,6 @@ export default {
           type: 'success'
         })
         this.gethotKwordsList()
-      }).catch(err => {
-        this.$message({
-          message: err,
-          type: 'error'
-        })
       })
     },
     moveWords(row, status) {
@@ -164,11 +165,6 @@ export default {
         } else {
           upMoveWords(row.wordId).then(() => {
             this.gethotKwordsList()
-          }).catch(err => {
-            this.$message({
-              message: err,
-              type: 'error'
-            })
           })
         }
       } else if (status === 'down') {
@@ -177,11 +173,6 @@ export default {
         } else {
           downMoveWords(row.wordId).then(() => {
             this.gethotKwordsList()
-          }).catch(err => {
-            this.$message({
-              message: err,
-              type: 'error'
-            })
           })
         }
       }
@@ -196,4 +187,7 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.edit-input {
+  width: 120px;
+}
 </style>

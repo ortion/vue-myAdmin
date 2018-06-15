@@ -5,8 +5,7 @@
     </div>
     <div class="photoGallery" v-else>
       <el-scrollbar style="height:100%;">
-        <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" 
-        class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
+        <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
           <div class="photoGallery-operate">
             <i class="el-icon-success" v-if="!isDeleteStatus&&(index==isIndex)"></i>
             <el-checkbox-group v-model="checkedImg" @change="handleChange" v-if="isDeleteStatus">
@@ -84,7 +83,14 @@ export default {
     },
     // 图片管理
     Upload(file) {
-      var fileName = 'banner' + file.file.uid
+      var fileName = ''
+      if (this.photoType === 'banner') {
+        fileName = 'banner' + file.file.uid
+      } else if (this.photoType === 'icon') {
+        fileName = 'icon' + file.file.uid
+      } else if (this.photoType === 'shop') {
+        fileName = 'shop' + file.file.uid
+      }
       this.listLoading = true
       // uploadAli().then(response => {
       //   console.log(response)

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>banner管理</h3>
-    <el-table :data="bannerUpdateList" style="width: 100%" empty-text="暂无数据">
+    <el-table :data="bannerUpdateList" style="width: 100%">
       <el-table-column label="图片地址">
         <template slot-scope="scope">
           <div class="picture-img" @click="openImgs(scope.$index)">
@@ -12,7 +12,7 @@
       </el-table-column>
       <el-table-column label="链接地址">
         <template slot-scope="scope">
-          <el-input v-model="scope.row.linkUrl" size="small" placeholder="请输入内容" suffix-icon="el-icon-edit"></el-input>
+          <el-input v-model.trim="scope.row.linkUrl" size="small" placeholder="请输入内容" suffix-icon="el-icon-edit"></el-input>
         </template>
       </el-table-column>
       <el-table-column label="操作" width="250px">
@@ -127,6 +127,8 @@ export default {
       getBannerPic().then(response => {
         var data = response.data
         this.picList = data.reverse()
+        this.listLoading = false
+      }).catch(() => {
         this.listLoading = false
       })
     },

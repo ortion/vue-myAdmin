@@ -96,7 +96,6 @@ export default {
     handleChange(value) {
       this.checkedID = value
       this.$emit('checkedID', this.checkedID)
-      console.log(value)
     },
     toggleChange(value) {
       // console.log(value)
@@ -110,51 +109,7 @@ export default {
         return true // 不可勾选
       }
     },
-    // 首页目录
-    // checkIndex(item) {
-    //   if (typeof item.CheckAll === 'undefined') {
-    //     this.$set(item, 'CheckAll', true)
-    //   } else {
-    //     item.CheckAll = !item.CheckAll
-    //   }
-    //   if (item.CheckAll) {
-    //     if (typeof item.children[0].children[0].childrenCheckAll === 'undefined') {
-    //       this.$set(item.children[0].children[0], 'childrenCheckAll', true)
-    //     }
-    //     if (this.checkedID.indexOf(item.children[0].children[0].authSign) < 0) {
-    //       this.checkedID.push(item.children[0].children[0].authSign)
-    //     }
-    //   } else {
-    //     if (item.children[0].children[0].childrenCheckAll) {
-    //       item.children[0].children[0].childrenCheckAll = !item.children[0].children[0].childrenCheckAll
-    //     }
-    //     if (this.checkedID.indexOf(item.children[0].children[0].authSign) >= 0) {
-    //       this.checkedID.splice(this.checkedID.indexOf(item.children[0].children[0].authSign), 1)
-    //     }
-    //   }
-    // },
-    // checkIndexChildren(children, item) {
-    //   if (typeof item.firstCheckAll === 'undefined') {
-    //     this.$set(item, 'firstCheckAll', true)
-    //   }
-    //   if (typeof children.SecondCheckAll === 'undefined') {
-    //     this.$set(children, 'SecondCheckAll', true)
-    //   } else {
-    //     children.SecondCheckAll = !children.SecondCheckAll
-    //   }
-    //   if (children.SecondCheckAll) {
-    //     if (this.checkedID.indexOf(item.authSign) < 0) {
-    //       this.checkedID.push(item.authSign)
-    //     }
-    //   } else {
-    //     if (item.firstCheckAll) {
-    //       item.firstCheckAll = !item.firstCheckAll
-    //     }
-    //     if (this.checkedID.indexOf(item.authSign) >= 0) {
-    //       this.checkedID.splice(this.checkedID.indexOf(item.authSign), 1)
-    //     }
-    //   }
-    // },
+
     //  一级目录全选
     checkFirstAll(data) {
       this.activeName.push(data.authSign)

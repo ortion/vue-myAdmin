@@ -42,13 +42,29 @@ export function deleteType(id) {
   })
 }
 // 企业增加
-export function addCompany(id) {
+export function addCompany(data) {
   return request({
     url: 'company/add',
     method: 'POST',
     data: {
       'token': getToken(),
-      'id': id
+      'name': data.companyname,
+      'companyType': data.companyType,
+      'province': data.provinceId,
+      'city': data.cityId,
+      'town': data.districtId,
+      'licence': data.licence,
+      'corporation': data.corporation,
+      'corporationPhone': data.corporationPhone,
+      'licencePicUrl': data.licencePicUrl,
+      'charge': data.charge,
+      'chargePhone': data.chargePhone,
+      'chargeSex': data.chargeSex,
+      'accountBank': data.accountBank,
+      'accountNo': data.accountNo,
+      'accountName': data.accountName,
+      'wechatNo': data.wechatNo,
+      'alipayNo': data.alipayNo
     }
   })
 }

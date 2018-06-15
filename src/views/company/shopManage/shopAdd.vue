@@ -9,7 +9,7 @@
         </el-select>
       </el-form-item> -->
       <el-form-item label="门店名称">
-        <el-input v-model="shopForm.shopname" placeholder="请输入门店名称"></el-input>
+        <el-input v-model.trim="shopForm.shopname" placeholder="请输入门店名称"></el-input>
       </el-form-item>
       <el-form-item label="门店分类">
         <el-select v-model="shopForm.shopType" placeholder="请选择">
@@ -24,10 +24,10 @@
       <el-form-item label="门店地址">
         <ul>
           <li>
-            <cascader @selectData="selectData" :dataList="cityData" @clearData="clearData" :dataType="'city'"></cascader>
+            <city-cascader @selectData="selectData"  @clearData="clearData"></city-cascader>
           </li>
           <li>
-            <el-input v-model="shopForm.address" placeholder="请输入详细地址" class="cityInput"></el-input>
+            <el-input v-model.trim="shopForm.address" placeholder="请输入详细地址" class="cityInput"></el-input>
           </li>
           <li v-if="subwayList.length>0">
             <div class="inlint checkboxTitle">
@@ -74,11 +74,11 @@
         <goods-category @typeList="goodsTypeList"></goods-category>
       </el-form-item>
       <el-form-item label="联系电话1">
-        <el-input placeholder="请输入联系电话" v-model="shopForm.phone1">
+        <el-input placeholder="请输入联系电话" v-model.trim="shopForm.phone1">
         </el-input>
       </el-form-item>
       <el-form-item label="联系电话2">
-        <el-input placeholder="请输入联系电话" v-model="shopForm.phone2">
+        <el-input placeholder="请输入联系电话" v-model.trim="shopForm.phone2">
         </el-input>
       </el-form-item>
       <el-form-item>
@@ -96,16 +96,16 @@
 
 <script>
 import logo from '@/assets/logo.png'
-import Cascader from '@/components/Cascader'
+import CityCascader from '@/components/CityCascader'
 import PhotoAlbum from '@/components/PhotoAlbum'
 import goodsCategory from './components/goodsCategory'
-import { getCity, getSubway } from '@/api/city'
+import { getSubway } from '@/api/city'
 import { addShop } from '@/api/company/shop'
 import { getShopPic } from '@/api/picManage'
 export default {
   name: 'shopAdd',
   components: {
-    Cascader,
+    CityCascader,
     PhotoAlbum,
     goodsCategory
   },
@@ -117,6 +117,7 @@ export default {
         shopname: '',
         shopType: '',
         introdcution: '',
+        provinceId: '',
         cityId: '',
         districtId: '',
         address: '',
@@ -137,12 +138,7 @@ export default {
           name: '加盟店'
         }
       ],
-      // 城市
-      cityData: {
-        provinceList: [],
-        cityList: [],
-        districtList: []
-      },
+
       subwayList: [],
       // 图片库
       businessCircle: [],
@@ -153,7 +149,6 @@ export default {
     }
   },
   created() {
-    this.getProvince()
   },
   methods: {
     onSave() {
@@ -198,22 +193,7 @@ export default {
         this.listLoading = false
       })
     },
-    // 城市选择
-    getProvince() {
-      getCity().then(response => {
-        this.cityData.provinceList = response.data
-      })
-    },
-    getCities(id) {
-      getCity(id).then(response => {
-        this.cityData.cityList = response.data
-      })
-    },
-    getDistrict(id) {
-      getCity(id).then(response => {
-        this.cityData.districtList = response.data
-      })
-    },
+    // 地铁选择
     getSubwayList(id) {
       getSubway(id).then(response => {
         this.subwayList = response.data
@@ -232,10 +212,9 @@ export default {
     // 联动选择器
     selectData(data) {
       if (data.firstValue) {
-        this.getCities(data.firstValue)
+        this.shopForm.provinceId = data.firstValue
       }
       if (data.secondValue) {
-        this.getDistrict(data.secondValue)
         this.getSubwayList(data.secondValue)
         this.shopForm.cityId = data.secondValue
       }
@@ -247,11 +226,9 @@ export default {
       if (num === 1) {
         this.shopForm.cityId = ''
         this.shopForm.districtId = ''
-        this.cityData.cityList = []
-        this.cityData.districtList = []
+        this.subwayList = []
       } else if (num === 2) {
         this.shopForm.districtId = ''
-        this.cityData.districtList = []
       }
     }
   }

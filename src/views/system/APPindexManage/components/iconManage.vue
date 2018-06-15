@@ -79,6 +79,8 @@ export default {
         var data = response.data
         this.picList = data.reverse()
         this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
     selectImg(url) {

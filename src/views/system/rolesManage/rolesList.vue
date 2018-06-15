@@ -6,7 +6,7 @@
         <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
       </div>
     </div>
-    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row empty-text="暂无数据">
+    <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column align="center" label='序号'>
         <template slot-scope="scope">
           {{scope.$index+1}}
@@ -62,6 +62,8 @@ export default {
         } else {
           this.list = []
         }
+        this.listLoading = false
+      }).catch(() => {
         this.listLoading = false
       })
     },

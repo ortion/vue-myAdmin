@@ -18,10 +18,16 @@
 </template>
 
 <script>
+import { getCity } from '@/api/city'
 export default {
-  props: ['dataList', 'dataType'],
   data() {
     return {
+      // 城市
+      dataList: {
+        provinceList: [],
+        cityList: [],
+        districtList: []
+      },
       cityData: {
         firstValue: '',
         secondValue: '',
@@ -29,23 +35,47 @@ export default {
       }
     }
   },
+  created() {
+    this.getProvince()
+  },
   methods: {
     firstChange(val) {
       this.cityData.firstValue = val
       this.cityData.secondValue = ''
       this.cityData.thirdValue = ''
+      this.dataList.cityList = []
+      this.dataList.districtList = []
+      this.getCities(val)
       this.$emit('selectData', this.cityData)
       this.$emit('clearData', 1)
     },
     secondChange(val) {
       this.cityData.secondValue = val
       this.cityData.thirdValue = ''
+      this.dataList.districtList = []
+      this.getDistrict(val)
       this.$emit('selectData', this.cityData)
       this.$emit('clearData', 2)
     },
     thirdChange(val) {
       this.cityData.thirdValue = val
       this.$emit('selectData', this.cityData)
+    },
+    // 城市选择
+    getProvince() {
+      getCity().then(response => {
+        this.dataList.provinceList = response.data
+      })
+    },
+    getCities(id) {
+      getCity(id).then(response => {
+        this.dataList.cityList = response.data
+      })
+    },
+    getDistrict(id) {
+      getCity(id).then(response => {
+        this.dataList.districtList = response.data
+      })
     }
   }
 }

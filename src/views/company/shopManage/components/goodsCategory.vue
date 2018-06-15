@@ -12,7 +12,7 @@
                 </el-select>
             </div>
             <div class="inlint">
-                <el-input v-model="category.rate" placeholder="佣金" class="commission"></el-input>
+                <el-input v-model.trim="category.rate" placeholder="佣金" class="commission"></el-input>
                 <span>%</span>
                 <el-button v-if="index==0" type="primary" @click="addCategory" size="medium">添加</el-button>
                 <el-button v-else type="primary" @click="deleteCategory(index)" size="medium">删除</el-button>

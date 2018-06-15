@@ -4,7 +4,7 @@
     <h3 v-else>新增权限</h3>
     <el-form ref="roleForm" :model="roleForm" label-width="120px">
       <el-form-item label="角色名称">
-        <el-input v-model="roleForm.roleName" placeholder="请输入角色名称"></el-input>
+        <el-input v-model.trim="roleForm.roleName" placeholder="请输入角色名称"></el-input>
       </el-form-item>
       <el-form-item label="角色权限">
         <permission-tree @checkedID="checkedID" :dataList="dataList" border v-loading.body="listLoading" element-loading-text="Loading"></permission-tree>
@@ -64,6 +64,8 @@ export default {
         this.dataList = response.data.authList
         this.merchantList = response.data.orgTypeList
         this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
     loadRolesUpateList(roleId) {
@@ -78,10 +80,11 @@ export default {
         })
         this.roleForm.roleName = response.data.roleName
         this.listLoading = false
+      }).catch(() => {
+        this.listLoading = false
       })
     },
     onSave() {
-      this.roleForm.roleName = this.roleForm.roleName.trim()
       if (this.roleForm.roleName && this.roleForm.merchant && (this.roleForm.checkedID.length > 0)) {
         this.loading = true
         addRoles(this.roleForm).then(
@@ -99,7 +102,6 @@ export default {
       } else { this.$message('不可以为空') }
     },
     onUpdate() {
-      this.roleForm.roleName = this.roleForm.roleName.trim()
       if (this.roleForm.roleName && this.roleForm.merchant && (this.roleForm.checkedID.length > 0)) {
         this.loading = true
         updateRoles(this.roleId, this.roleForm).then(
