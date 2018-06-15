@@ -108,7 +108,9 @@ export default {
     },
     selectImg(url) {
       this.isImgDialog = false
-      this.bannerUpdateList[this.selectEditIndex].imageUrl = url
+      if (url) {
+        this.bannerUpdateList[this.selectEditIndex].imageUrl = url
+      }
     },
     isClose() {
       this.isCloseStatus = true

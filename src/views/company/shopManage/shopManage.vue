@@ -55,15 +55,15 @@
             <el-button size="mini" type="success" plain>详情</el-button>
             <el-button size="mini" type="danger" plain>删除</el-button>
             <el-button size="mini" type="primary" plain>商品管理</el-button>
-            <el-button size="mini" type="warning" plain>临时关店</el-button>
-            <el-button size="mini" type="warning" plain>取消临时关店</el-button>
+            <el-button size="mini" type="warning" plain v-if="!closeShop">临时关店</el-button>
+            <el-button size="mini" type="warning" plain v-if="closeShop">取消临时关店</el-button>
           </div>
         </template>
       </el-table-column>
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pageSize" layout="total,prev, pager, next, jumper" :total="totelPage">
+      <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pageSize" layout="total,prev, pager, next, jumper" :total="totelCount">
       </el-pagination>
     </div>
 
@@ -77,7 +77,7 @@ export default {
     return {
       shopList: [],
       currentPage: 1,
-      totelPage: 1,
+      totelCount: 1,
       pageSize: 10
 
     }
@@ -94,7 +94,7 @@ export default {
       getShops().then(response => {
         if (response.data) {
           this.shopList = response.data.shops
-          this.totelPage = this.shopList.length
+          this.totelCount = response.data.tolCount
           this.pageSize = response.data.pageSize
           this.currentPage = response.data.curPage
         } else {

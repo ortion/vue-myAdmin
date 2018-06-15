@@ -85,7 +85,11 @@ export default {
     },
     selectImg(url) {
       this.isPhotosDialog = false
-      this.updateIcon.picUrl = url
+      if (url) {
+        this.updateIcon.picUrl = url
+      } else {
+        this.updateIcon.picUrl = this.nowIcon.picUrl
+      }
     },
     isClose() {
       this.isCloseStatus = true
