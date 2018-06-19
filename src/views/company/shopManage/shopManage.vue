@@ -49,10 +49,13 @@
       </el-table-column>
       <el-table-column prop="whyStop" label="操作原因" align="center">
       </el-table-column>
-      <el-table-column align="center" label="操作" width="250px">
+      <el-table-column align="center" label="操作" width="350px">
         <template slot-scope="scope">
           <div style="text-align:left">
-            <el-button size="mini" type="success" plain>详情</el-button>
+            <router-link :to="{name: 'shopDetail', query: {id: scope.row.id}}">
+              <el-button size="mini" type="success" plain>详情</el-button>
+            </router-link>
+
             <el-button size="mini" type="danger" plain>删除</el-button>
             <el-button size="mini" type="primary" plain>商品管理</el-button>
             <el-button size="mini" type="warning" plain v-if="!closeShop">临时关店</el-button>
@@ -63,7 +66,7 @@
     </el-table>
 
     <div class="pagination-container">
-      <el-pagination @current-change="handleCurrentChange" :current-page="currentPage" :page-size="pageSize" layout="total,prev, pager, next, jumper" :total="totelCount">
+      <el-pagination @current-change="handleCurrentChange" :current-page="query.currentPage" :page-size="query.pageSize" layout="total,prev, pager, next, jumper" :total="totelCount">
       </el-pagination>
     </div>
 
@@ -76,27 +79,29 @@ export default {
   data() {
     return {
       shopList: [],
-      currentPage: 1,
-      totelCount: 1,
-      pageSize: 10
-
+      query: {
+        currentPage: 1,
+        pageSize: 10
+      },
+      totelCount: 1
     }
   },
   created() {
     this.getShopList()
   },
   methods: {
-    handleCurrentChange() {
-
+    handleCurrentChange(val) {
+      this.query.currentPage = val
+      this.getShopList()
     },
     getShopList() {
       this.listLoading = true
-      getShops().then(response => {
+      getShops(this.query).then(response => {
         if (response.data) {
           this.shopList = response.data.shops
           this.totelCount = response.data.tolCount
-          this.pageSize = response.data.pageSize
-          this.currentPage = response.data.curPage
+          this.query.pageSize = response.data.pageSize
+          this.query.currentPage = response.data.curPage
         } else {
           this.shopList = []
         }

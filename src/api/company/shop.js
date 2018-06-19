@@ -1,12 +1,15 @@
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
 // 门店列表查询
-export function getShops() {
+export function getShops(query) {
   return request({
     url: 'shop/list',
     method: 'POST',
     data: {
-      'token': getToken()
+      'token': getToken(),
+      'curPage': query.currentPage,
+      'pageSize': query.pageSize
+
     }
   })
 }
@@ -31,6 +34,16 @@ export function addShop(data) {
       'shopCats': data.goodsType,
       'phone1': data.phone1,
       'phone2': data.phone2
+    }
+  })
+}
+export function getShopDetail(id) {
+  return request({
+    url: 'shop/detail',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'id': id
     }
   })
 }

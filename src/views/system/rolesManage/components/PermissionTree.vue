@@ -24,18 +24,18 @@
           <el-collapse-item :name="item.authSign">
             <template slot="title">
               <div class="fir-title">
-                <el-checkbox :label="item.authSign" v-cloak @change="checkFirstAll(item)" v-model="item.firstCheckAll"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
+                <el-checkbox :label="item.authSign" v-cloak @change="checkFirstAll(item)" v-model="item.isSelect"> {{isMapName(item.level,item.authSign)}}</el-checkbox>
               </div>
             </template>
             <div v-show="item.children" class="second-ul">
               <el-row v-for="(second,cur) in item.children" :key="second.id">
                 <el-col :span="6" class="left">
-                  <el-checkbox @change="checkSecondAll(second,item)" v-model="second.SecondCheckAll" :label="second.authSign" v-cloak>
+                  <el-checkbox @change="checkSecondAll(second,item)" v-model="second.isSelect" :label="second.authSign" v-cloak>
                     {{isMapName(second.level,second.authSign)}}
                   </el-checkbox>
                 </el-col>
                 <el-col :span="18" class="right">
-                  <el-checkbox :disabled="checkboxInit(p.authSign)" @change="checkthird(p,second,item)" v-model="p.thirdCheckAll" v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
+                  <el-checkbox :disabled="checkboxInit(p.authSign)" @change="checkthird(p,second,item)" v-model="p.isSelect" v-for="p in second.children" :label="p.authSign" :key="p.id" v-cloak>
                     {{isMapName(p.level,p.authSign)}}
                   </el-checkbox>
                 </el-col>
@@ -113,47 +113,29 @@ export default {
     //  一级目录全选
     checkFirstAll(data) {
       this.activeName.push(data.authSign)
-      if (typeof data.firstCheckAll === 'undefined') {
-        this.$set(data, 'firstCheckAll', true)
-      } else {
-        data.firstCheckAll = !data.firstCheckAll
-      }
-      if (data.firstCheckAll) {
+      data.isSelect = !data.isSelect
+      if (data.isSelect) {
         data.children.forEach(items => {
-          if (typeof items.SecondCheckAll === 'undefined') {
-            this.$set(items, 'SecondCheckAll', true)
-          } else {
-            items.SecondCheckAll = true
+          items.isSelect = true
+          if (this.checkedID.indexOf(items.authSign) < 0) {
+            this.checkedID.push(items.authSign)
           }
-          if (items.SecondCheckAll) {
-            if (this.checkedID.indexOf(items.authSign) < 0) {
-              this.checkedID.push(items.authSign)
-            }
 
-            items.children.forEach(item => {
-              if (typeof item.thirdCheckAll === 'undefined') {
-                this.$set(item, 'thirdCheckAll', true)
-              } else {
-                item.thirdCheckAll = true
-              }
-              if (this.checkedID.indexOf(item.authSign) < 0) {
-                this.checkedID.push(item.authSign)
-              }
-            })
-          }
+          items.children.forEach(item => {
+            item.isSelect = true
+            if (this.checkedID.indexOf(item.authSign) < 0) {
+              this.checkedID.push(item.authSign)
+            }
+          })
         })
       } else {
         data.children.forEach(items => {
-          if (items.SecondCheckAll) {
-            items.SecondCheckAll = !items.SecondCheckAll
-          }
+          items.isSelect = false
           if (this.checkedID.indexOf(items.authSign) >= 0) {
             this.checkedID.splice(this.checkedID.indexOf(items.authSign), 1)
           }
           items.children.forEach(item => {
-            if (item.thirdCheckAll) {
-              item.thirdCheckAll = !item.thirdCheckAll
-            }
+            item.isSelect = false
             if (this.checkedID.indexOf(item.authSign) >= 0) {
               this.checkedID.splice(this.checkedID.indexOf(item.authSign), 1)
             }
@@ -162,44 +144,32 @@ export default {
       }
     },
     checkSecondAll(data, parentDate) {
-      if (typeof parentDate.firstCheckAll === 'undefined') {
-        this.$set(parentDate, 'firstCheckAll', true)
-      } else {
-        parentDate.firstCheckAll = !parentDate.firstCheckAll
-      }
-      if (typeof data.SecondCheckAll === 'undefined') {
-        this.$set(data, 'SecondCheckAll', true)
-      } else {
-        data.SecondCheckAll = !data.SecondCheckAll
-      }
-      if (data.SecondCheckAll) {
+      data.isSelect = !data.isSelect
+      if (data.isSelect) {
+        parentDate.isSelect = true
         if (this.checkedID.indexOf(parentDate.authSign) < 0) {
           this.checkedID.push(parentDate.authSign)
         }
         // const arr = []
         data.children.forEach(items => {
-          if (typeof items.thirdCheckAll === 'undefined') {
-            this.$set(items, 'thirdCheckAll', true)
-          } else {
-            items.thirdCheckAll = true
-          }
+          items.isSelect = true
           if (this.checkedID.indexOf(items.authSign) < 0) {
             this.checkedID.push(items.authSign)
           }
         })
       } else {
         if (!this.FilterId(parentDate)) {
-          if (parentDate.firstCheckAll) {
-            parentDate.firstCheckAll = !parentDate.firstCheckAll
+          if (parentDate.isSelect) {
+            parentDate.isSelect = false
+            this.checkedID.splice(this.checkedID.indexOf(parentDate.authSign), 1)
           }
-          this.checkedID.splice(this.checkedID.indexOf(parentDate.authSign), 1)
         }
         data.children.forEach(items => {
-          if (items.thirdCheckAll) {
-            items.thirdCheckAll = !items.thirdCheckAll
-          }
-          if (this.checkedID.indexOf(items.authSign) >= 0) {
-            this.checkedID.splice(this.checkedID.indexOf(items.authSign), 1)
+          if (items.isSelect) {
+            items.isSelect = false
+            if (this.checkedID.indexOf(items.authSign) >= 0) {
+              this.checkedID.splice(this.checkedID.indexOf(items.authSign), 1)
+            }
           }
         })
       }
@@ -210,18 +180,8 @@ export default {
     },
     // 三级目录
     checkthird(third, second, first) {
-      if (typeof second.SecondCheckAll === 'undefined') {
-        this.$set(second, 'SecondCheckAll', true)
-      }
-      if (typeof first.firstCheckAll === 'undefined') {
-        this.$set(first, 'firstCheckAll', true)
-      }
-      if (typeof third.thirdCheckAll === 'undefined') {
-        this.$set(third, 'thirdCheckAll', true)
-      } else {
-        third.thirdCheckAll = !third.thirdCheckAll
-      }
-      if (third.thirdCheckAll) {
+      third.isSelect = !third.isSelect
+      if (third.isSelect) {
         if (this.checkedID.indexOf(second.authSign) < 0) {
           this.checkedID.push(second.authSign)
         }
@@ -234,16 +194,16 @@ export default {
         }
       }
       if (!this.FilterId(second)) {
-        if (second.SecondCheckAll) {
-          second.SecondCheckAll = !second.SecondCheckAll
+        if (second.isSelect) {
+          second.isSelect = false
+          this.checkedID.splice(this.checkedID.indexOf(second.authSign), 1)
         }
-        this.checkedID.splice(this.checkedID.indexOf(second.authSign), 1)
       }
       if (!this.FilterId(first)) {
-        if (first.firstCheckAll) {
-          first.firstCheckAll = !first.firstCheckAll
+        if (first.isSelect) {
+          first.isSelect = false
+          this.checkedID.splice(this.checkedID.indexOf(first.authSign), 1)
         }
-        this.checkedID.splice(this.checkedID.indexOf(first.authSign), 1)
       }
     }
 

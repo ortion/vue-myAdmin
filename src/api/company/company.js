@@ -68,3 +68,14 @@ export function addCompany(data) {
     }
   })
 }
+export function getCompanys(query) {
+  return request({
+    url: 'company/list',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'curPage': query.currentPage,
+      'pageSize': query.pageSize
+    }
+  })
+}
