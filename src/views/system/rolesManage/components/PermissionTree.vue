@@ -122,19 +122,25 @@ export default {
         data.children.forEach(items => {
           if (typeof items.SecondCheckAll === 'undefined') {
             this.$set(items, 'SecondCheckAll', true)
+          } else {
+            items.SecondCheckAll = true
           }
-          if (this.checkedID.indexOf(items.authSign) < 0) {
-            this.checkedID.push(items.authSign)
-          }
+          if (items.SecondCheckAll) {
+            if (this.checkedID.indexOf(items.authSign) < 0) {
+              this.checkedID.push(items.authSign)
+            }
 
-          items.children.forEach(item => {
-            if (typeof item.thirdCheckAll === 'undefined') {
-              this.$set(item, 'thirdCheckAll', true)
-            }
-            if (this.checkedID.indexOf(item.authSign) < 0) {
-              this.checkedID.push(item.authSign)
-            }
-          })
+            items.children.forEach(item => {
+              if (typeof item.thirdCheckAll === 'undefined') {
+                this.$set(item, 'thirdCheckAll', true)
+              } else {
+                item.thirdCheckAll = true
+              }
+              if (this.checkedID.indexOf(item.authSign) < 0) {
+                this.checkedID.push(item.authSign)
+              }
+            })
+          }
         })
       } else {
         data.children.forEach(items => {
@@ -158,6 +164,8 @@ export default {
     checkSecondAll(data, parentDate) {
       if (typeof parentDate.firstCheckAll === 'undefined') {
         this.$set(parentDate, 'firstCheckAll', true)
+      } else {
+        parentDate.firstCheckAll = !parentDate.firstCheckAll
       }
       if (typeof data.SecondCheckAll === 'undefined') {
         this.$set(data, 'SecondCheckAll', true)
@@ -172,6 +180,8 @@ export default {
         data.children.forEach(items => {
           if (typeof items.thirdCheckAll === 'undefined') {
             this.$set(items, 'thirdCheckAll', true)
+          } else {
+            items.thirdCheckAll = true
           }
           if (this.checkedID.indexOf(items.authSign) < 0) {
             this.checkedID.push(items.authSign)
@@ -222,20 +232,21 @@ export default {
         if (this.checkedID.indexOf(third.authSign) >= 0) {
           this.checkedID.splice(this.checkedID.indexOf(third.authSign), 1)
         }
-        if (!this.FilterId(second)) {
-          if (second.SecondCheckAll) {
-            second.SecondCheckAll = !second.SecondCheckAll
-          }
-          this.checkedID.splice(this.checkedID.indexOf(second.authSign), 1)
+      }
+      if (!this.FilterId(second)) {
+        if (second.SecondCheckAll) {
+          second.SecondCheckAll = !second.SecondCheckAll
         }
-        if (!this.FilterId(first)) {
-          if (first.firstCheckAll) {
-            first.firstCheckAll = !first.firstCheckAll
-          }
-          this.checkedID.splice(this.checkedID.indexOf(first.authSign), 1)
+        this.checkedID.splice(this.checkedID.indexOf(second.authSign), 1)
+      }
+      if (!this.FilterId(first)) {
+        if (first.firstCheckAll) {
+          first.firstCheckAll = !first.firstCheckAll
         }
+        this.checkedID.splice(this.checkedID.indexOf(first.authSign), 1)
       }
     }
+
   }
 
 }
@@ -262,8 +273,8 @@ export default {
 .el-collapse-item__content {
   padding-bottom: 0;
 }
-.fir-title{
-    padding-left: 10px;
+.fir-title {
+  padding-left: 10px;
 }
 .left {
   padding-left: 10px;
