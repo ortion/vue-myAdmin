@@ -244,9 +244,7 @@ export default {
 .right {
   padding-left: 10px;
 }
-.second-ul {
-  /* border-top: 1px solid #ebeef5; */
-}
+
 .second-ul .left {
   padding-left: 35px;
   line-height: 40px;

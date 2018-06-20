@@ -71,6 +71,10 @@
   margin: 0;
 }
 
+.el-card__header {
+  padding: 15px 20px;
+}
+
 #app .main-container {
   transition: margin-left .28s;
   margin-left: 180px;
@@ -295,6 +299,10 @@ li {
   display: inline-block;
   vertical-align: middle;
   margin-bottom: 10px;
+}
+
+.filter-container .filter-main .el-row {
+  margin-top: 15px;
 }
 
 .pagination-container {

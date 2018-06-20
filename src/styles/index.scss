@@ -80,6 +80,7 @@ li {
     flex-direction: column;
     height: 100%;
 }
+
 .app-main {
     // min-height: 450px;
     flex: 1 0 auto;
@@ -107,11 +108,16 @@ li {
         vertical-align: middle;
         margin-bottom: 10px;
     }
+    .filter-main .el-row {
+        margin-top: 15px;
+    }
 }
+
 .pagination-container {
     margin-top: 30px;
     text-align: right
-  }
+}
+
 img {
     display: block;
     width: 100%;
@@ -120,15 +126,17 @@ img {
 .inlint {
     display: inline-block;
 }
-.tipMessage{
+
+.tipMessage {
     font-size: 12px;
     color: #666666
 }
+
 .link-type,
 .link-type:focus {
-  color: #337ab7;
-  cursor: pointer;
-  &:hover {
-    color: rgb(32, 160, 255);
-  }
+    color: #337ab7;
+    cursor: pointer;
+    &:hover {
+        color: rgb(32, 160, 255);
+    }
 }

@@ -1,16 +1,20 @@
+import Vue from 'vue'
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
 // 门店列表查询
 export function getShops(query) {
+  var data = {
+    'token': getToken()
+  }
+  for (const key in query) {
+    if (query[key] !== '') {
+      Vue.set(data, key, query[key])
+    }
+  }
   return request({
     url: 'shop/list',
     method: 'POST',
-    data: {
-      'token': getToken(),
-      'curPage': query.currentPage,
-      'pageSize': query.pageSize
-
-    }
+    data
   })
 }
 
@@ -44,6 +48,27 @@ export function getShopDetail(id) {
     data: {
       'token': getToken(),
       'id': id
+    }
+  })
+}
+export function deleteShop(id) {
+  return request({
+    url: 'shop/delete',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'id': id
+    }
+  })
+}
+export function stopShop(id, text) {
+  return request({
+    url: 'shop/stop',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'id': id,
+      'whyStop': text
     }
   })
 }

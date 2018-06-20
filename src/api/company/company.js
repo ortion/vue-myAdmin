@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import request from '@/utils/request'
 import { getToken } from '@/utils/auth'
 // 企业类型管理
@@ -69,13 +70,38 @@ export function addCompany(data) {
   })
 }
 export function getCompanys(query) {
+  var data = {
+    'token': getToken()
+  }
+  for (const key in query) {
+    if (query[key] !== '') {
+      Vue.set(data, key, query[key])
+    }
+  }
   return request({
     url: 'company/list',
     method: 'POST',
+    data
+  })
+}
+export function getCompanyDetail(id) {
+  return request({
+    url: 'company/detail',
+    method: 'POST',
     data: {
       'token': getToken(),
-      'curPage': query.currentPage,
-      'pageSize': query.pageSize
+      'id': id
+    }
+  })
+}
+// 企业开停
+export function statusCompany(id) {
+  return request({
+    url: 'company/onoff',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'id': id
     }
   })
 }
