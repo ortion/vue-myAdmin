@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       opening: 'banner',
-      nowIcon: {}
+      nowIcon: ''
     }
   },
   methods: {

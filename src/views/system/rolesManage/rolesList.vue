@@ -1,32 +1,36 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <h3>权限管理</h3>
-      <div style="text-align:right">
-        <el-button class="filter-item" style="margin-left: 10px;" @click="handleCreate" type="primary" icon="el-icon-edit">增加</el-button>
-      </div>
+      <el-row type="flex" justify="space-between">
+        <el-col :span="12">
+          <div style="line-height:32px">权限管理</div>
+        </el-col>
+        <el-col :span="12">
+          <div style="text-align:right">
+            <router-link :to="{name: 'rolesAdd'}">
+              <el-button type="primary" icon="el-icon-edit">添加权限</el-button>
+            </router-link>
+          </div>
+        </el-col>
+      </el-row>
     </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
-      <el-table-column align="center" label='序号'>
+      <el-table-column align="center" label='序号' width="60">
         <template slot-scope="scope">
           {{scope.$index+1}}
         </template>
       </el-table-column>
-      <el-table-column label="角色" align="center">
-        <template slot-scope="scope">
-          {{scope.row.roleName}}
-        </template>
+      <el-table-column prop="roleName" label="角色" align="center">
       </el-table-column>
-      <el-table-column label="所属机构" align="center">
-        <template slot-scope="scope">
-          <span>{{scope.row.merchantTypeName}}</span>
-        </template>
+      <el-table-column prop="merchantTypeName" label="所属机构" align="center">
       </el-table-column>
-      <el-table-column align="center" label="操作">
+      <el-table-column align="center" label="操作" width="220">
         <template slot-scope="scope">
           <div style="text-align:left">
             <el-button size="mini" type="success" plain @click="handleModifyStatus(scope.row,'published')">分配</el-button>
-            <el-button v-if="scope.row.roleId!==superRoleId" type="primary" size="mini" plain @click="handleUpdate(scope.row)">修改</el-button>
+            <router-link :to="{name: 'rolesAdd', query: { roleId: scope.row.roleId }}">
+              <el-button v-if="scope.row.roleId!==superRoleId" type="primary" size="mini" plain>修改</el-button>
+            </router-link>
             <el-button v-if="scope.row.roleId!==superRoleId" size="mini" type="danger" plain @click="deleteRoles(scope.row)">删除</el-button>
           </div>
         </template>
@@ -66,12 +70,6 @@ export default {
       }).catch(() => {
         this.listLoading = false
       })
-    },
-    handleCreate() {
-      this.$router.push({ name: 'rolesAdd' })
-    },
-    handleUpdate(row) {
-      this.$router.push({ name: 'rolesAdd', query: { roleId: row.roleId }})
     },
     deleteRoles(row) {
       this.$confirm('是否确定删除角色:' + row.roleName, '提示', {

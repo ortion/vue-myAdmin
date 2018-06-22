@@ -21,31 +21,31 @@
         <div class="filter-main">
           <el-row :gutter="20">
             <el-col :span="12">
-              门店编号：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业编号" v-model="query.id">
+              <label>门店编号：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业编号" v-model="query.id">
               </el-input>
             </el-col>
             <el-col :span="12">
-              门店名称：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业名称" v-model="query.name">
+              <label>门店名称：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业名称" v-model="query.name">
               </el-input>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
-              门店负责人：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入门店负责人" v-model="query.linkman">
+              <label>门店负责人：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入门店负责人" v-model="query.linkman">
               </el-input>
             </el-col>
             <el-col :span="12">
-              负责人电话：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入负责人电话" v-model="query.phone">
+              <label>负责人电话：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入负责人电话" v-model="query.phone">
               </el-input>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="24">
-              门店状态：
+              <label>门店状态：</label>
               <el-select style="width:40%" v-model="query.status" placeholder="请选择企业状态">
                 <el-option v-for="item in shopStatus" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>

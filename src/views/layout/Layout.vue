@@ -27,7 +27,7 @@
           <el-input type="password" v-model="passForm.checkPass" auto-complete="off" placeholder="请确认新密码"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button @click="cancelDialog">取消</el-button>
+          <el-button @click="IsUpdatepwd = false">取消</el-button>
           <el-button type="primary" @click.native.prevent="submitPassword" :loading="loading">确定</el-button>
         </el-form-item>
       </el-form>
@@ -125,14 +125,6 @@ export default {
   },
 
   methods: {
-    cancelDialog() {
-      this.IsUpdatepwd = false
-      this.passForm = {
-        oldPass: '',
-        newPass: '',
-        checkPass: ''
-      }
-    },
     changeStatus(info) {
       if (info === 'userInfo') {
         this.IsUserinfo = true

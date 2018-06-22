@@ -30,4 +30,16 @@ export function validatAlphabets(str) {
   const reg = /^[A-Za-z]+$/
   return reg.test(str)
 }
-
+/* 手机号*/
+export function validatePhone(str) {
+  const urlregex = /^(1[3456789][0-9]{9})$/
+  return urlregex.test(str)
+}
+/* 联系电话*/
+export function validateMPhone(str) {
+  const isPhone = /^0[0-9]{2,3}-[0-9]{8}/ // 座机格式
+  const isMob = /^(1[3456789][0-9]{9})$/
+  const four = /^400[0-9]{7}/
+  const eight = /^800[0-9]{7}/
+  return isMob.test(str) | isPhone.test(str) | four.test(str) | eight.test(str)
+}

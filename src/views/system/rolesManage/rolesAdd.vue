@@ -1,7 +1,14 @@
 <template>
   <div class="app-container">
-    <h3 v-if="roleId">修改权限</h3>
-    <h3 v-else>新增权限</h3>
+    <div class="third-header">
+      <router-link :to="{name: 'rolesList'}">
+        <span class="backPrev">
+          <svg-icon icon-class="back" />
+        </span>
+      </router-link>
+      <span v-if="roleId">修改权限</span>
+      <span v-else>新增权限</span>
+    </div>
     <el-form ref="roleForm" :model="roleForm" label-width="120px">
       <el-form-item label="角色名称">
         <el-input v-model.trim="roleForm.roleName" placeholder="请输入角色名称"></el-input>
@@ -17,7 +24,6 @@
       <el-form-item>
         <el-button type="primary" :loading="loading" @click="onUpdate" v-if="roleId">修改</el-button>
         <el-button type="primary" :loading="loading" @click="onSave" v-else>保存</el-button>
-        <!-- <el-button @click="onCancel">取消</el-button> -->
       </el-form-item>
     </el-form>
   </div>
@@ -43,9 +49,6 @@ export default {
       // 防止重复提交
       loading: false
     }
-  },
-  computed: {
-
   },
   created() {
     if (this.roleId) {
@@ -121,7 +124,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 </style>
 

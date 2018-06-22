@@ -3,9 +3,9 @@
     <h3>门店详情</h3>
     <ul>
       <li>所属企业：{{shopdetail.companyName}}</li>
-      <li>企业名称：{{shopdetail.name}}</li>
-      <li>企业分类：{{shopdetail.shopType}}</li>
-      <li>企业描述：{{shopdetail.introdcution}}</li>
+      <li>门店名称：{{shopdetail.name}}</li>
+      <li>门店分类：{{shopdetail.shopType}}</li>
+      <li>门店介绍：{{shopdetail.introdcution}}</li>
       <li>门店地址：{{shopdetail.province}}{{shopdetail.city}}{{shopdetail.town}}{{shopdetail.address}}</li>
       <li>周边地铁：
         <span v-for="(item,index) in shopdetail.subways" :key="index">

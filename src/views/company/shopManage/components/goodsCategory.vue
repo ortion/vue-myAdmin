@@ -1,24 +1,26 @@
 <template>
-    <div>
-        <div v-for="(category,index) in selectType" class="goodsCategory">
-            <div class="inlint">
-                <el-select v-model="category.pcat" @change="pcatChange(category.pcat,index)" placeholder="一级类目">
-                    <el-option v-for="item in categoryData.firstList" :key="item.id" :label="item.name" :value="item.id">
-                    </el-option>
-                </el-select>
-                <el-select v-model="category.cat" @change="catChange(category.cat,index)" placeholder="全部">
-                    <el-option v-for="item in categoryData.secondList" :key="item.id" :label="item.name" :value="item.id">
-                    </el-option>
-                </el-select>
-            </div>
-            <div class="inlint">
-                <el-input v-model.trim="category.rate" placeholder="佣金" class="commission"></el-input>
-                <span>%</span>
-                <el-button v-if="index==0" type="primary" @click="addCategory" size="medium">添加</el-button>
-                <el-button v-else type="primary" @click="deleteCategory(index)" size="medium">删除</el-button>
-            </div>
-        </div>
+  <div>
+    <div v-for="(category,index) in selectType" class="goodsCategory">
+      <div class="inlint">
+        <el-select v-model="category.pcat" @change="pcatChange(category.pcat,index)" placeholder="一级类目">
+          <el-option v-for="item in categoryData.firstList" :key="item.id" :label="item.name" :value="item.id">
+          </el-option>
+        </el-select>
+        <el-select v-model="category.cat" @change="catChange(category.cat,index)" placeholder="全部">
+          <el-option v-for="item in categoryData.secondList" :key="item.id" :label="item.name" :value="item.id">
+          </el-option>
+        </el-select>
+      </div>
+      <div class="inlint">
+
+        <el-input v-model.trim="category.rate" placeholder="佣金" class="commission"></el-input>
+
+        <span>%</span>
+        <el-button v-if="index==0" type="primary" @click="addCategory" size="medium">添加</el-button>
+        <el-button v-else type="primary" @click="deleteCategory(index)" size="medium">删除</el-button>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -34,9 +36,9 @@ export default {
       },
       selectType: [
         {
-          pcat: '',
+          pcat: 1,
           cat: '',
-          rate: ''
+          rate: '1'
         }
       ]
     }
@@ -66,9 +68,9 @@ export default {
     addCategory() {
       this.selectType.push(
         {
-          pcat: '',
+          pcat: 1,
           cat: '',
-          rate: ''
+          rate: '1'
         }
       )
     },

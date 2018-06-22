@@ -305,6 +305,11 @@ li {
   margin-top: 15px;
 }
 
+.filter-container .filter-main .el-row label {
+  display: inline-block;
+  width: 100px;
+}
+
 .pagination-container {
   margin-top: 30px;
   text-align: right;
@@ -317,6 +322,10 @@ img {
 
 .inlint {
   display: inline-block;
+}
+
+.edit-input {
+  width: 120px;
 }
 
 .tipMessage {
@@ -332,5 +341,22 @@ img {
 
 .link-type:hover,
 .link-type:focus:hover {
+  color: #20a0ff;
+}
+
+.third-header {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.backPrev {
+  font-size: 20px;
+  margin-right: 15px;
+  color: #337ab7;
+  cursor: pointer;
+}
+
+.backPrev:hover {
   color: #20a0ff;
 }

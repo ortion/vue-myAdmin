@@ -21,37 +21,37 @@
         <div class="filter-main">
           <el-row :gutter="20">
             <el-col :span="12">
-              企业编号：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业编号" v-model="query.id">
+              <label>企业编号：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业编号" v-model="query.id">
               </el-input>
             </el-col>
             <el-col :span="12">
-              企业名称：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业名称" v-model="query.name">
-              </el-input>
-            </el-col>
-          </el-row>
-          <el-row :gutter="20">
-            <el-col :span="12">
-              企业负责人：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业法人" v-model="query.charge">
-              </el-input>
-            </el-col>
-            <el-col :span="12">
-              负责人电话：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入企业法人电话" v-model="query.chargePhone">
+              <label>企业名称：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业名称" v-model="query.name">
               </el-input>
             </el-col>
           </el-row>
           <el-row :gutter="20">
             <el-col :span="12">
-              所在地区：
-              <el-input @keyup.enter.native="handleFilter" style="width:80%" placeholder="请输入所在地区" v-model="query.adrName">
+              <label>企业负责人：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业法人" v-model="query.charge">
               </el-input>
             </el-col>
             <el-col :span="12">
-              企业状态：
-              <el-select style="width:80%" v-model="query.status" placeholder="请选择企业状态">
+              <label>负责人电话：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入企业法人电话" v-model="query.chargePhone">
+              </el-input>
+            </el-col>
+          </el-row>
+          <el-row :gutter="20">
+            <el-col :span="12">
+              <label>所在地区：</label>
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入所在地区" v-model="query.adrName">
+              </el-input>
+            </el-col>
+            <el-col :span="12">
+              <label>企业状态：</label>
+              <el-select style="width:70%" v-model="query.status" placeholder="请选择企业状态">
                 <el-option v-for="item in companyStatus" :key="item.id" :label="item.name" :value="item.id">
                 </el-option>
               </el-select>
@@ -102,7 +102,9 @@
             </router-link>
             <el-button v-if="scope.row.status==1" @click="switchCompany(scope.row,'off')" size="mini" type="danger" plain>停用</el-button>
             <el-button v-if="scope.row.status==2" @click="switchCompany(scope.row,'on')" size="mini" type="danger" plain>开启</el-button>
-            <el-button size="mini" type="primary" plain>添加下级门店</el-button>
+            <router-link :to="{name: 'shopAdd', query: {id: scope.row.id,name:scope.row.name}}">
+              <el-button size="mini" type="primary" plain>添加下级门店</el-button>
+            </router-link>
           </div>
         </template>
       </el-table-column>
@@ -215,5 +217,4 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 </style>

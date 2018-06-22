@@ -20,11 +20,6 @@
       <li>负责人姓名：{{companydetail.charge}}</li>
       <li>负责人性别：{{companydetail.chargeSex}}</li>
       <li>负责人电话：{{companydetail.chargePhone}}</li>
-      <li>上传营业执照：
-        <div style="width:150px">
-          <img :src="companydetail.imageUrl" alt="">
-        </div>
-      </li>
     </ul>
     <p class="content-title">财务信息</p>
     <ul>

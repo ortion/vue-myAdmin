@@ -20,7 +20,7 @@
             </el-checkbox>
           </el-col>
         </el-row>
-        <el-collapse @change="toggleChange" v-model="activeName" v-else>
+        <el-collapse v-model="activeName" v-else>
           <el-collapse-item :name="item.authSign">
             <template slot="title">
               <div class="fir-title">
@@ -96,10 +96,6 @@ export default {
     handleChange(value) {
       this.checkedID = value
       this.$emit('checkedID', this.checkedID)
-    },
-    toggleChange(value) {
-      // console.log(value)
-      // this.checkedID.indexOf(value)
     },
     // 初始化判断不可编辑
     checkboxInit(index) {
@@ -182,6 +178,8 @@ export default {
     checkthird(third, second, first) {
       third.isSelect = !third.isSelect
       if (third.isSelect) {
+        second.isSelect = true
+        first.isSelect = true
         if (this.checkedID.indexOf(second.authSign) < 0) {
           this.checkedID.push(second.authSign)
         }

@@ -1,10 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <h3>热门搜索管理</h3>
-      <div style="text-align:right">
-        <el-button class="filter-item" style="margin-left: 10px;" @click="addWords" type="primary" icon="el-icon-edit">增加</el-button>
-      </div>
+      <el-row type="flex" justify="space-between">
+        <el-col :span="12">
+          <div style="line-height:32px">热门搜索管理</div>
+        </el-col>
+        <el-col :span="12">
+          <div style="text-align:right">
+            <el-button type="primary" @click="isShowDialog = true" icon="el-icon-edit">添加热门搜索词</el-button>
+          </div>
+        </el-col>
+      </el-row>
     </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column align="center" label='序号'>
@@ -34,16 +40,16 @@
       </el-table-column>
     </el-table>
     <!-- 点击增加弹出层 -->
-    <el-dialog title="增加热搜词" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
+    <el-dialog title="增加热搜词" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px" center>
       <el-form :model="wordsForm" label-width="80px">
-        <el-form-item label="热搜词" prop="oldPass">
+        <el-form-item label="热搜词">
           <el-input v-model.trim="wordsForm.name" auto-complete="off" placeholder="请输入热搜词"></el-input>
         </el-form-item>
-        <el-form-item>
-          <el-button @click="cancelDialog">取消</el-button>
-          <el-button type="primary" @click.native.prevent="submitWords" :loading="loading">确定</el-button>
-        </el-form-item>
       </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="isShowDialog = false">取消</el-button>
+        <el-button type="primary" @click.native.prevent="submitWords" :loading="loading">确定</el-button>
+      </div>
     </el-dialog>
   </div>
 </template>
@@ -92,15 +98,6 @@ export default {
       }).catch(() => {
         this.listLoading = false
       })
-    },
-    addWords() {
-      this.isShowDialog = true
-    },
-    cancelDialog() {
-      this.isShowDialog = false
-      this.wordsForm = {
-        name: ''
-      }
     },
     submitWords() {
       if (this.wordsForm.name) {
@@ -187,7 +184,4 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.edit-input {
-  width: 120px;
-}
 </style>

@@ -17,17 +17,17 @@
     </div>
     <div class="photobotton">
       <div v-if="!isDeleteStatus">
-        <el-button @click="openCheckbox" size="small" type="primary">删除</el-button>
+        <el-button @click="isDeleteStatus = true" size="small" type="primary">删除</el-button>
         <el-button @click="submitPhoto" size="small" type="primary">确定</el-button>
       </div>
       <div v-if="isDeleteStatus">
         <el-button @click="DeletePhoto" size="small" type="primary">批量删除</el-button>
-        <el-button @click="cencelCheckbox" size="small" type="primary">取消</el-button>
+        <el-button @click="isDeleteStatus = false" size="small" type="primary">取消</el-button>
       </div>
     </div>
     <div class="photobotton" style="float:right">
       <el-upload :http-request="Upload" :multiple="true" :show-file-list="false" action="">
-        <el-button size="small" type="primary">点击上传</el-button>
+        <el-button size="small" type="primary" :loading="loading">点击上传</el-button>
       </el-upload>
     </div>
   </div>
@@ -56,7 +56,9 @@ export default {
       isDeleteStatus: false,
       // selectImgList: [],
       isIndex: -1,
-      selectImgUrl: ''
+      selectImgUrl: '',
+      // 防止重复提交
+      loading: false
     }
   },
   methods: {
@@ -91,6 +93,7 @@ export default {
       } else if (this.photoType === 'shop') {
         fileName = 'shop' + file.file.uid
       }
+      this.loading = true
       this.listLoading = true
       // uploadAli().then(response => {
       //   console.log(response)
@@ -109,18 +112,14 @@ export default {
             this.$emit('updatedata', true)
           })
         }
+        this.loading = false
+        this.listLoading = false
       }).catch(err => {
         console.log(err)
+        this.loading = false
+        this.listLoading = false
       })
-
-      this.listLoading = false
       // })
-    },
-    openCheckbox() {
-      this.isDeleteStatus = true
-    },
-    cencelCheckbox() {
-      this.isDeleteStatus = false
     },
     DeletePhoto() {
       var imgList = []

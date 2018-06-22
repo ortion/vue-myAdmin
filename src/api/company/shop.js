@@ -25,7 +25,7 @@ export function addShop(data) {
     method: 'POST',
     data: {
       'token': getToken(),
-      'mercantId': data.mercantId,
+      'companyId': data.companyId,
       'name': data.shopname,
       'shopType': data.shopType,
       'introdcution': data.introdcution,
@@ -69,6 +69,16 @@ export function stopShop(id, text) {
       'token': getToken(),
       'id': id,
       'whyStop': text
+    }
+  })
+}
+// 获得所属企业列表
+export function getCompanyAll() {
+  return request({
+    url: 'company/simplelist',
+    method: 'POST',
+    data: {
+      'token': getToken()
     }
   })
 }

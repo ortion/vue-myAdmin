@@ -33,7 +33,7 @@
       <el-button type="primary" @click="onSave" :loading="loading">保存</el-button>
     </div>
     <!-- 图片弹出层 -->
-    <el-dialog title="图片库" :visible.sync="isImgDialog" @close="isClose" @open="isOpen">
+    <el-dialog title="图片库" :visible.sync="isImgDialog" @close="isCloseStatus = true" @open="isCloseStatus = false">
       <photo-album :photoType="'banner'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus" :listLoading="listLoading"></photo-album>
     </el-dialog>
 
@@ -112,12 +112,6 @@ export default {
         this.bannerUpdateList[this.selectEditIndex].imageUrl = url
       }
     },
-    isClose() {
-      this.isCloseStatus = true
-    },
-    isOpen() {
-      this.isCloseStatus = false
-    },
     updateData(boot) {
       if (boot) {
         this.getPicList()
@@ -174,19 +168,19 @@ export default {
 .picture-img {
   position: relative;
   cursor: pointer;
-}
-.picture-img .tag-button {
-  position: absolute;
-  //   top: 50%;
-  //   left: 50%;
-  //   transform: translate(-50%, -50%);˝
-  bottom: 0;
-  left: 0;
-  background-color: rgba(255, 255, 255, 0.8);
-}
-.picture-img img {
-  width: 150px;
-  height: 80px;
+  .tag-button {
+    position: absolute;
+    //   top: 50%;
+    //   left: 50%;
+    //   transform: translate(-50%, -50%);˝
+    bottom: 0;
+    left: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+  }
+  img {
+    width: 150px;
+    height: 80px;
+  }
 }
 .add-button {
   padding: 10px;

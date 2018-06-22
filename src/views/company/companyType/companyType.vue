@@ -1,10 +1,16 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <h3>企业类型管理</h3>
-      <div style="text-align:right">
-        <el-button class="filter-item" style="margin-left: 10px;" @click="addType" type="primary" icon="el-icon-edit">增加</el-button>
-      </div>
+      <el-row type="flex" justify="space-between">
+        <el-col :span="12">
+          <div style="line-height:32px">企业类型管理</div>
+        </el-col>
+        <el-col :span="12">
+          <div style="text-align:right">
+            <el-button type="primary" @click="isShowDialog = true" icon="el-icon-edit">添加企业类型</el-button>
+          </div>
+        </el-col>
+      </el-row>
     </div>
     <el-table :data="list" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
       <el-table-column align="center" label='序号'>
@@ -34,11 +40,11 @@
     <!-- 点击增加弹出层 -->
     <el-dialog title="新增分类" @close="isClose" :visible.sync="isShowDialog" :show-close="false" width="400px">
       <el-form :model="typeForm" label-width="80px">
-        <el-form-item label="分类名称" prop="oldPass">
+        <el-form-item label="分类名称">
           <el-input v-model.trim="typeForm.name" auto-complete="off" placeholder="请输入分类名称"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button @click="cancelDialog">取消</el-button>
+          <el-button @click="isShowDialog = false">取消</el-button>
           <el-button type="primary" @click.native.prevent="submitType" :loading="loading">确定</el-button>
         </el-form-item>
       </el-form>
@@ -90,15 +96,6 @@ export default {
         this.listLoading = false
       })
     },
-    addType() {
-      this.isShowDialog = true
-    },
-    cancelDialog() {
-      this.isShowDialog = false
-      this.typeForm = {
-        name: ''
-      }
-    },
     submitType() {
       if (this.typeForm.name) {
         this.loading = true
@@ -147,12 +144,18 @@ export default {
       }
     },
     deleteCompanyType(row) {
-      deleteType(row.id).then(() => {
-        this.$message({
-          message: '删除分类成功',
-          type: 'success'
+      this.$confirm('是否确定删除类型:' + row.name, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteType(row.id).then(res => {
+          this.getCompanyType()
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
         })
-        this.getCompanyType()
       }).catch(() => {
       })
     },
@@ -167,7 +170,4 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.edit-input {
-  width: 120px;
-}
 </style>

@@ -12,9 +12,8 @@
       <el-button type="info" plain @click="returnPhone">还原</el-button>
       <el-button type="primary" @click="onSave" :loading="loading">确认</el-button>
     </div>
-    <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isClose" @open="isOpen">
+    <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isCloseStatus = true" @open="isCloseStatus = false">
       <photo-album :photoType="'icon'" :photoList="picList" @updatedata="updateData" @selectImg="selectImg" :closeDialog="isCloseStatus" :listLoading="listLoading"></photo-album>
-
     </el-dialog>
   </div>
 </template>
@@ -91,12 +90,6 @@ export default {
         this.updateIcon.picUrl = this.nowIcon.picUrl
       }
     },
-    isClose() {
-      this.isCloseStatus = true
-    },
-    isOpen() {
-      this.isCloseStatus = false
-    },
     updateData(boot) {
       if (boot) {
         this.getPicList()
@@ -116,9 +109,9 @@ export default {
   width: 250px;
   height: 250px;
   margin: 0 auto;
-}
-.avatar-uploader:hover {
-  border-color: #409eff;
+  &:hover {
+    border-color: #409eff;
+  }
 }
 .avatar-uploader-icon {
   font-size: 28px;

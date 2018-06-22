@@ -13,6 +13,7 @@
         <el-option v-for="item in dataList.districtList" :key="item.id" :label="item.name" :value="item.id">
         </el-option>
       </el-select>
+      </el-form>
     </div>
   </div>
 </template>
@@ -83,7 +84,7 @@ export default {
 
 <style scoped lang="scss">
 .cascaderSelect {
-  margin-bottom: 15px;
+  // margin-bottom: 15px;
 }
 .cascaderSelect .el-select {
   margin-right: 10px;

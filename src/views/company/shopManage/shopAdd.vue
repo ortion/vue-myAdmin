@@ -1,17 +1,25 @@
 <template>
   <div class="app-container">
-    <h3>新建门店</h3>
-    <el-form ref="shopForm" :model="shopForm" label-width="120px" class="shopForm">
-      <!-- <el-form-item label="所属企业">
-        <el-select v-model="value" placeholder="请选择企业">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+    <div class="third-header">
+      <router-link :to="{name: 'shopManage'}">
+        <span class="backPrev">
+          <svg-icon icon-class="back" />
+        </span>
+      </router-link>
+      <span>新建门店</span>
+    </div>
+    <el-form :rules="companyRules" ref="shopForm" :model="shopForm" label-width="120px" class="shopForm">
+      <el-form-item label="所属企业" prop="companyId">
+        <span v-if="companyStatus">{{cname}}</span>
+        <el-select v-else v-model="shopForm.companyId" placeholder="请选择企业">
+          <el-option v-for="item in companysList" :key="item.id" :label="item.name" :value="item.id">
           </el-option>
         </el-select>
-      </el-form-item> -->
-      <el-form-item label="门店名称">
+      </el-form-item>
+      <el-form-item label="门店名称" prop="shopname">
         <el-input v-model.trim="shopForm.shopname" placeholder="请输入门店名称"></el-input>
       </el-form-item>
-      <el-form-item label="门店分类">
+      <el-form-item label="门店分类" prop="shopType">
         <el-select v-model="shopForm.shopType" placeholder="请选择">
           <el-option v-for="typeItem in shopTypeList" :key="typeItem.id" :label="typeItem.name" :value="typeItem.id">
           </el-option>
@@ -24,9 +32,9 @@
       <el-form-item label="门店地址">
         <ul>
           <li>
-            <city-cascader @selectData="selectData"  @clearData="clearData"></city-cascader>
+            <city-cascader @selectData="selectData" @clearData="clearData"></city-cascader>
           </li>
-          <li>
+          <li style="margin-top:15px">
             <el-input v-model.trim="shopForm.address" placeholder="请输入详细地址" class="cityInput"></el-input>
           </li>
           <li v-if="subwayList.length>0">
@@ -37,7 +45,7 @@
             </div>
             <div class="inlint">
               <el-checkbox-group v-model="shopForm.subways" @change="subwaysChange" class="checkboxGroup" :max="5">
-                <el-checkbox v-for="subway in subwayList" :label="subway.id" :key="subway.id" v-cloak>
+                <el-checkbox :disabled="disabledHandle(subway.id)" v-for="subway in subwayList" :label="subway.id" :key="subway.id" v-cloak>
                   {{subway.name}}
                 </el-checkbox>
               </el-checkbox-group>
@@ -70,25 +78,24 @@
           <el-button type="primary" @click="openPhotos" size="medium">选择</el-button>
         </div>
       </el-form-item>
-      <el-form-item label="可用商品类目">
+      <el-form-item label="可用商品类目" prop="goodsType" required="">
         <goods-category @typeList="goodsTypeList"></goods-category>
       </el-form-item>
-      <el-form-item label="联系电话1">
+      <el-form-item label="联系电话1" prop="phone1">
         <el-input placeholder="请输入联系电话" v-model.trim="shopForm.phone1">
         </el-input>
       </el-form-item>
-      <el-form-item label="联系电话2">
+      <el-form-item label="联系电话2" prop="phone2">
         <el-input placeholder="请输入联系电话" v-model.trim="shopForm.phone2">
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSave">保存</el-button>
-        <!-- <el-button @click="onCancel">取消</el-button> -->
+        <el-button v-loading="loading" type="primary" @click="onSave">保存</el-button>
       </el-form-item>
 
     </el-form>
     <!-- 图片库 -->
-    <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isClose" @open="isOpen">
+    <el-dialog title="图片库" :visible.sync="isPhotosDialog" @close="isCloseStatus = true" @open="isCloseStatus = false">
       <photo-album :photoType="'shop'" :photoList="picList" @selectImg="selectImg" @updatedata="updateData" :closeDialog="isCloseStatus"></photo-album>
     </el-dialog>
   </div>
@@ -100,8 +107,9 @@ import CityCascader from '@/components/CityCascader'
 import PhotoAlbum from '@/components/PhotoAlbum'
 import goodsCategory from './components/goodsCategory'
 import { getSubway } from '@/api/city'
-import { addShop } from '@/api/company/shop'
+import { addShop, getCompanyAll } from '@/api/company/shop'
 import { getShopPic } from '@/api/picManage'
+import { validateMPhone } from '@/utils/validate'
 export default {
   name: 'shopAdd',
   components: {
@@ -110,10 +118,24 @@ export default {
     goodsCategory
   },
   data() {
+    const validateAllCall = (rule, value, callback) => {
+      if (value) {
+        if (validateMPhone(value)) {
+          callback()
+        } else {
+          callback(null)
+        }
+      } else {
+        callback()
+      }
+    }
     return {
       logo,
+      loading: false,
+      companyStatus: false,
+      cname: this.$route.query.name,
       shopForm: {
-        mercantId: '',
+        companyId: '',
         shopname: '',
         shopType: '',
         introdcution: '',
@@ -140,24 +162,80 @@ export default {
       ],
 
       subwayList: [],
+      companysList: [],
       // 图片库
       businessCircle: [],
       isPhotosDialog: false,
       isCloseStatus: false,
-      picList: []
+      picList: [],
+      companyRules: {
+        companyId: [
+          { required: true, message: '请选择企业', trigger: 'change' }
+        ],
+        shopname: [
+          { required: true, message: '请输入门店名称', trigger: 'blur' }
+        ],
+        shopType: [
+          { required: true, message: '请选择门店分类', trigger: 'change' }
+        ],
+        phone1: [
+          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
+        ],
+        phone2: [
+          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
+        ]
+      }
 
     }
   },
-  created() {
+  computed: {
+    cid: function() {
+      if (this.$route.query.id) {
+        return this.$route.query.id
+      } else {
+        return ''
+      }
+    }
+  },
+  mounted() {
+    if (this.$route.query.id) {
+      this.companyStatus = true
+      this.shopForm.companyId = this.$route.query.id
+    } else {
+      this.companyStatus = false
+      this.getCompanysList()
+    }
   },
   methods: {
+    // 验证商品类目
     onSave() {
-      addShop(this.shopForm).then(response => {
-        this.$message({
-          type: 'success',
-          message: '保存成功!'
-        })
-        // this.$router.push({ name: 'rolesList' })
+      this.$refs.shopForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          addShop(this.shopForm).then(response => {
+            this.$message({
+              type: 'success',
+              message: '保存成功!'
+            })
+            this.loading = false
+            // this.$router.push({ name: 'rolesList' })
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    // 所属企业
+    getCompanysList() {
+      getCompanyAll().then(response => {
+        if (response.data) {
+          this.companysList = response.data
+        } else {
+          this.companysList = []
+        }
       })
     },
     // 商品类目
@@ -165,12 +243,6 @@ export default {
       this.shopForm.goodsType = val
     },
     // 门店图标
-    isClose() {
-      this.isCloseStatus = true
-    },
-    isOpen() {
-      this.isCloseStatus = false
-    },
     openPhotos(index) {
       this.isPhotosDialog = true
       this.getPicList()
@@ -199,15 +271,17 @@ export default {
         this.subwayList = response.data
       })
     },
-    subwaysChange(val) {
-      if (val.length > 5) {
-        this.$message({
-          message: '最多选择5条地铁线路',
-          type: 'warning'
-        })
-      } else {
-        this.shopForm.subways = val
+    disabledHandle(index) {
+      if (this.shopForm.subways.length >= 5) {
+        if (this.shopForm.subways.indexOf(index) < 0) {
+          return true
+        } else {
+          return false
+        }
       }
+    },
+    subwaysChange(val) {
+      this.shopForm.subways = val
     },
     // 联动选择器
     selectData(data) {
