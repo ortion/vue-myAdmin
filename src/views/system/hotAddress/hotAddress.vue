@@ -99,7 +99,17 @@ export default {
       })
     },
     submitCitys() {
-      if (this.cityForm.name) {
+      if (!this.cityForm.name) {
+        this.$message({
+          type: 'warning',
+          message: '地址不能为空'
+        })
+      } else if (this.cityForm.name.length >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '地址字数超过最大长度'
+        })
+      } else {
         this.loading = true
         addHCity(this.cityForm.name).then(() => {
           this.loading = false
@@ -112,15 +122,20 @@ export default {
         }).catch(() => {
           this.loading = false
         })
-      } else {
+      }
+    },
+    updateAddress(row) {
+      if (!row.cityName) {
         this.$message({
           type: 'warning',
           message: '地址不能为空'
         })
-      }
-    },
-    updateAddress(row) {
-      if (row.cityName) {
+      } else if (row.cityName.length >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '地址字数超过最大长度'
+        })
+      } else {
         this.loading = true
         row.originalTitle = row.cityName
         this.cityForm.id = row.cityId
@@ -137,11 +152,6 @@ export default {
           }
         }).catch(() => {
           this.loading = false
-        })
-      } else {
-        this.$message({
-          type: 'warning',
-          message: '地址不能为空'
         })
       }
     },

@@ -21,7 +21,7 @@
       <el-table-column label="分类名称" align="center">
         <template slot-scope="scope">
           <template v-if="scope.row.edit">
-            <el-input class="edit-input" size="small" v-model="scope.row.name"></el-input>
+            <el-input class="edit-input" size="small" v-model.trim="scope.row.name"></el-input>
             <el-button class='cancel-btn' size="small" type="warning" @click="cancelEdit(scope.row)">取消</el-button>
           </template>
           <span v-else>{{ scope.row.name }}</span>
@@ -97,7 +97,17 @@ export default {
       })
     },
     submitType() {
-      if (this.typeForm.name) {
+      if (!this.typeForm.name) {
+        this.$message({
+          type: 'warning',
+          message: '名称不能为空'
+        })
+      } else if (this.typeForm.name >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '名称字数超过最大长度'
+        })
+      } else {
         this.loading = true
         addType(this.typeForm.name).then(() => {
           this.loading = false
@@ -110,15 +120,20 @@ export default {
         }).catch(() => {
           this.loading = false
         })
-      } else {
+      }
+    },
+    updateCompanyType(row) {
+      if (!row.name) {
         this.$message({
           type: 'warning',
           message: '名称不能为空'
         })
-      }
-    },
-    updateCompanyType(row) {
-      if (row.name) {
+      } else if (row.name.length >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '名称字数超过最大长度'
+        })
+      } else {
         this.loading = true
         row.originalTitle = row.name
         this.typeForm.id = row.id
@@ -135,11 +150,6 @@ export default {
           }
         }).catch(() => {
           this.loading = false
-        })
-      } else {
-        this.$message({
-          type: 'warning',
-          message: '名称不能为空'
         })
       }
     },

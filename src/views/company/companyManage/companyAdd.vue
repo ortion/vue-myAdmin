@@ -187,7 +187,7 @@ export default {
                 message: '保存成功!'
               })
               this.loading = false
-              // this.$router.push({ name: 'rolesList' })
+              this.$router.push({ name: 'companyManage' })
             }).catch(() => {
               this.loading = false
             })

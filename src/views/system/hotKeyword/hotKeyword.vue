@@ -100,7 +100,17 @@ export default {
       })
     },
     submitWords() {
-      if (this.wordsForm.name) {
+      if (!this.wordsForm.name) {
+        this.$message({
+          type: 'warning',
+          message: '热搜词不能为空'
+        })
+      } else if (this.wordsForm.name.length >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '热搜词字数超过最大长度'
+        })
+      } else {
         this.loading = true
         addWords(this.wordsForm.name).then(() => {
           this.loading = false
@@ -113,15 +123,20 @@ export default {
         }).catch(() => {
           this.loading = false
         })
-      } else {
+      }
+    },
+    updateWords(row) {
+      if (!row.wordText) {
         this.$message({
           type: 'warning',
           message: '热搜词不能为空'
         })
-      }
-    },
-    updateWords(row) {
-      if (row.wordText) {
+      } else if (row.wordText.length >= 15) {
+        this.$message({
+          type: 'warning',
+          message: '热搜词字数超过最大长度'
+        })
+      } else {
         this.loading = true
         row.originalTitle = row.wordText
         this.wordsForm.id = row.wordId
@@ -138,11 +153,6 @@ export default {
           }
         }).catch(() => {
           this.loading = false
-        })
-      } else {
-        this.$message({
-          type: 'warning',
-          message: '热搜词不能为空'
         })
       }
     },

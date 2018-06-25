@@ -78,8 +78,41 @@
           <el-button type="primary" @click="openPhotos" size="medium">选择</el-button>
         </div>
       </el-form-item>
-      <el-form-item label="可用商品类目" prop="goodsType" required="">
-        <goods-category @typeList="goodsTypeList"></goods-category>
+
+      <el-form-item label="可用商品类目" required>
+        <div v-for="(domain, index) in shopForm.goodsType" :key="index">
+          <el-row>
+            <el-col :span="16">
+              <el-form-item style="margin-bottom:25px;" :prop="'goodsType.' + index + '.pcat'" :rules="[
+      {required: true, message: '一级类目不能为空', trigger: 'change'},
+    ]">
+                <el-select v-model="domain.pcat" @change="pcatChange(domain.pcat,index)" placeholder="一级类目">
+                  <el-option v-for="item in categoryData.firstList" :key="item.id" :label="item.name" :value="item.id">
+                  </el-option>
+                </el-select>
+                <el-select v-model="domain.cat" @change="catChange(domain.cat,index)" placeholder="全部">
+                  <el-option v-for="item in categoryData.secondList" :key="item.id" :label="item.name" :value="item.id">
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item style="margin-bottom:25px;" :prop="'goodsType.' + index + '.rate'" :rules="[
+      {required: true, message: '佣金不能为空', trigger: 'blur'},
+
+      {type:'number',min:0,max:100,  message: '佣金必须为0-100之间的数字', trigger: 'blur'}
+    ]">
+                <el-input v-model.number="domain.rate" class="commission" placeholder="请输入佣金"></el-input>
+                <span>%</span>
+
+                <el-button v-if="index==0" type="primary" @click="addCategory" size="medium">添加</el-button>
+                <el-button v-else type="primary" @click="deleteCategory(key)" size="medium">删除</el-button>
+              </el-form-item>
+            </el-col>
+          </el-row>
+        </div>
+      </el-form-item>
+
       </el-form-item>
       <el-form-item label="联系电话1" prop="phone1">
         <el-input placeholder="请输入联系电话" v-model.trim="shopForm.phone1">
@@ -105,8 +138,8 @@
 import logo from '@/assets/logo.png'
 import CityCascader from '@/components/CityCascader'
 import PhotoAlbum from '@/components/PhotoAlbum'
-import goodsCategory from './components/goodsCategory'
 import { getSubway } from '@/api/city'
+import { getCategory } from '@/api/goods'
 import { addShop, getCompanyAll } from '@/api/company/shop'
 import { getShopPic } from '@/api/picManage'
 import { validateMPhone } from '@/utils/validate'
@@ -114,8 +147,7 @@ export default {
   name: 'shopAdd',
   components: {
     CityCascader,
-    PhotoAlbum,
-    goodsCategory
+    PhotoAlbum
   },
   data() {
     const validateAllCall = (rule, value, callback) => {
@@ -145,10 +177,17 @@ export default {
         address: '',
         subways: [],
         shoplogoUrl: '',
-        goodsType: [],
+        goodsType: [
+          {
+            pcat: '',
+            cat: '',
+            rate: ''
+          }
+        ],
         phone1: '',
         phone2: ''
       },
+      pcatFirstValue: '',
       // 门店分类
       shopTypeList: [
         {
@@ -160,7 +199,11 @@ export default {
           name: '加盟店'
         }
       ],
-
+      // 商品类目
+      categoryData: {
+        firstList: [],
+        secondList: []
+      },
       subwayList: [],
       companysList: [],
       // 图片库
@@ -198,6 +241,7 @@ export default {
     }
   },
   mounted() {
+    this.getGoodsCategory()
     if (this.$route.query.id) {
       this.companyStatus = true
       this.shopForm.companyId = this.$route.query.id
@@ -207,7 +251,6 @@ export default {
     }
   },
   methods: {
-    // 验证商品类目
     onSave() {
       this.$refs.shopForm.validate(valid => {
         if (valid) {
@@ -218,7 +261,11 @@ export default {
               message: '保存成功!'
             })
             this.loading = false
-            // this.$router.push({ name: 'rolesList' })
+            if (this.companyStatus) {
+              this.$router.push({ name: 'companyManage' })
+            } else {
+              this.$router.push({ name: 'shopManage' })
+            }
           }).catch(() => {
             this.loading = false
           })
@@ -239,8 +286,35 @@ export default {
       })
     },
     // 商品类目
-    goodsTypeList(val) {
-      this.shopForm.goodsType = val
+    addCategory() {
+      this.shopForm.goodsType.push(
+        {
+          pcat: '',
+          cat: '',
+          rate: ''
+        }
+      )
+    },
+    deleteCategory(index) {
+      this.shopForm.goodsType.splice(index, 1)
+    },
+    // 商品类目
+    getGoodsCategory(id) {
+      getCategory(id).then(response => {
+        if (id) {
+          this.categoryData.secondList = response.data
+        } else {
+          this.categoryData.firstList = response.data
+        }
+      })
+    },
+    pcatChange(val, index) {
+      this.getGoodsCategory(val)
+      this.shopForm.goodsType[index].pcat = val
+      this.shopForm.goodsType[index].cat = ''
+    },
+    catChange(val, index) {
+      this.shopForm.goodsType[index].cat = val
     },
     // 门店图标
     openPhotos(index) {
@@ -331,5 +405,8 @@ export default {
   width: 150px;
   height: 150px;
   vertical-align: bottom;
+}
+.commission {
+  width: 100px;
 }
 </style>
