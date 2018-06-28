@@ -89,6 +89,17 @@ export const constantRouterMap = [
       component: () => import('@/views/company/companyManage/companyDetail'),
       meta: { title: '企业详情' }
     }]
+  },
+  {
+    path: '/goods',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'goodsManage/goodsAdd',
+      name: 'goodsAdd',
+      component: () => import('@/views/goods/goodsManage/goodsAdd'),
+      meta: { title: '新建商品' }
+    }]
   }
 
 ]

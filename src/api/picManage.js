@@ -72,29 +72,29 @@ export function deleteIconPic(data) {
     }
   })
 }
-// 门店管理
-export function getShopPic() {
+// 门店管理/商品
+export function getBasePic(type) {
   return request({
     url: 'base/picload',
     method: 'POST',
     data: {
       'token': getToken(),
-      'type': 6
+      'type': type
     }
   })
 }
-export function uploadShopPic(data) {
+export function uploadBasePic(type, data) {
   return request({
     url: 'base/picupload',
     method: 'POST',
     data: {
       'token': getToken(),
-      'type': 6,
+      'type': type,
       'picList': data
     }
   })
 }
-export function deleteShopPic(data) {
+export function deleteBasePic(data) {
   return request({
     url: 'base/picdelete',
     method: 'POST',

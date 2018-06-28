@@ -102,7 +102,7 @@ export default {
           type: 'warning',
           message: '名称不能为空'
         })
-      } else if (this.typeForm.name >= 15) {
+      } else if (this.typeForm.name.length >= 15) {
         this.$message({
           type: 'warning',
           message: '名称字数超过最大长度'

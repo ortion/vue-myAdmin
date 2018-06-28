@@ -88,3 +88,35 @@ export function getValidShops(query) {
     data
   })
 }
+// 商品管理
+export function getGoodsList(query) {
+  var data = {
+    'token': getToken()
+  }
+  for (const key in query) {
+    if (query[key] !== '') {
+      Vue.set(data, key, query[key])
+    }
+  }
+  return request({
+    url: 'goods/list',
+    method: 'POST',
+    data
+  })
+}
+export function addGoods(data) {
+  return request({
+    url: 'goods/add',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'name': data.name,
+      'pcat': data.pcat,
+      'cat': data.cat,
+      'masterPicUrl': data.masterPicUrl,
+      'pics': data.picUrl,
+      'introduction': data.introduction,
+      'skus': data.skus
+    }
+  })
+}

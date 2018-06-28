@@ -7,7 +7,8 @@
       <el-scrollbar style="height:100%;">
         <div @click="selectPhoto(item,index)" v-for="(item,index) in photoList" :key="index" class="photoGallery-item" :style="'background-image: url(' + item.imageUrl + ')'">
           <div class="photoGallery-operate">
-            <i class="el-icon-success" v-if="!isDeleteStatus&&(index==isIndex)"></i>
+            <i class="el-icon-success" v-if="multipleStatus&&!isDeleteStatus&&item.isSelect"></i>
+            <i class="el-icon-success" v-if="!multipleStatus&&!isDeleteStatus&&(index==isIndex)"></i>
             <el-checkbox-group v-model="checkedImg" @change="handleChange" v-if="isDeleteStatus">
               <el-checkbox :label="item.imageUrl"></el-checkbox>
             </el-checkbox-group>
@@ -34,18 +35,25 @@
 </template>
 
 <script>
-import { uploadBannerPic, deleteBannerPic, uploadIconPic, deleteIconPic, uploadShopPic, deleteShopPic } from '@/api/picManage'
+import { uploadBannerPic, deleteBannerPic, uploadIconPic, deleteIconPic, uploadBasePic, deleteBasePic } from '@/api/picManage'
 import { client } from '@/utils/alioss'
 export default {
-  props: ['photoType', 'photoList', 'closeDialog'],
+  props: ['photoType', 'photoList', 'closeDialog', 'multipleStatus'],
   watch: {
     closeDialog(val) {
       if (val) {
         this.checkedImg = []
-        // this.selectImgList = []
+        this.selectImgList = []
         this.isIndex = -1
         this.isDeleteStatus = false
       }
+    }
+  },
+  created() {
+    if (this.multipleStatus) {
+      this.photoList.forEach(item => {
+        this.$set(item, 'isSelect', false)
+      })
     }
   },
   data() {
@@ -54,7 +62,7 @@ export default {
       fileList: [],
       checkedImg: [],
       isDeleteStatus: false,
-      // selectImgList: [],
+      selectImgList: [],
       isIndex: -1,
       selectImgUrl: '',
       // 防止重复提交
@@ -63,25 +71,27 @@ export default {
   },
   methods: {
     submitPhoto() {
-      this.$emit('selectImg', this.selectImgUrl)
+      if (this.multipleStatus) {
+        this.$emit('selectImg', this.selectImgList)
+      } else {
+        this.$emit('selectImg', this.selectImgUrl)
+      }
     },
     // 选择图片
     selectPhoto(data, index) {
-      this.isIndex = index
-      this.selectImgUrl = data.imageUrl
-      // 多选
-      // if (typeof data.isSelect === 'undefined') {
-      //   this.$set(data, 'isSelect', true)
-      // } else {
-      //   data.isSelect = !data.isSelect
-      // }
-      // if (data.isSelect) {
-      //   this.selectImgList.push(data.imageUrl)
-      // } else {
-      //   if (this.selectImgList.indexOf(data.imageUrl) >= 0) {
-      //     this.selectImgList.splice(this.selectImgList.indexOf(data.imageUrl), 1)
-      //   }
-      // }
+      if (this.multipleStatus) {
+        data.isSelect = !data.isSelect
+        if (data.isSelect) {
+          this.selectImgList.push(data.imageUrl)
+        } else {
+          if (this.selectImgList.indexOf(data.imageUrl) >= 0) {
+            this.selectImgList.splice(this.selectImgList.indexOf(data.imageUrl), 1)
+          }
+        }
+      } else {
+        this.isIndex = index
+        this.selectImgUrl = data.imageUrl
+      }
     },
     // 图片管理
     Upload(file) {
@@ -108,7 +118,11 @@ export default {
             this.$emit('updatedata', true)
           })
         } else if (this.photoType === 'shop') {
-          uploadShopPic(this.fileList).then(res => {
+          uploadBasePic(6, this.fileList).then(res => {
+            this.$emit('updatedata', true)
+          })
+        } else if (this.photoType === 'goods') {
+          uploadBasePic(7, this.fileList).then(res => {
             this.$emit('updatedata', true)
           })
         }
@@ -145,8 +159,8 @@ export default {
             this.checkedImg = []
             this.$emit('updatedata', true)
           })
-        } else if (this.photoType === 'shop') {
-          deleteShopPic(imgList).then(res => {
+        } else if (this.photoType === 'shop' || this.photoType === 'goods') {
+          deleteBasePic(imgList).then(res => {
             this.$message({
               type: 'success',
               message: '删除成功!'

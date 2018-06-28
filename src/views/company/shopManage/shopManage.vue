@@ -98,8 +98,8 @@
 
             <el-button @click="delShop(scope.row)" size="mini" type="danger" plain>删除</el-button>
             <el-button size="mini" type="primary" plain>商品管理</el-button>
-            <el-button v-if="scope.row.status==1" @click="switchShop(scope.row,'off')" size="mini" type="warning" plain>临时关店</el-button>
-            <el-button v-if="scope.row.status==2" @click="switchShop(scope.row,'on')" size="mini" type="warning" plain>取消临时关店</el-button>
+            <el-button v-if="scope.row.status==1" @click="switchShop(scope.row)" size="mini" type="warning" plain>临时关店</el-button>
+            <el-button v-if="scope.row.status==2" @click="switchShop(scope.row)" size="mini" type="warning" plain>取消临时关店</el-button>
           </div>
         </template>
       </el-table-column>
@@ -162,8 +162,8 @@ export default {
       }).catch(() => {
       })
     },
-    switchShop(row, val) {
-      if (val === 'off') {
+    switchShop(row) {
+      if (row.status === 1) {
         this.$prompt('请填写临时关店原因:', '您确定需要临时关闭"' + row.name + '"？', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -182,7 +182,7 @@ export default {
           }
         }).catch(() => {
         })
-      } else if (val === 'on') {
+      } else if (row.status === 2) {
         this.$confirm('确定需要取消临时关闭' + row.name, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',

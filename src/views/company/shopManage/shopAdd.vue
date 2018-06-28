@@ -102,11 +102,11 @@
 
       {type:'number',min:0,max:100,  message: '佣金必须为0-100之间的数字', trigger: 'blur'}
     ]">
-                <el-input v-model.number="domain.rate" class="commission" placeholder="请输入佣金"></el-input>
+                <el-input type="number" v-model.number="domain.rate" :min="0" :max="100" class="commission" placeholder="请输入佣金"></el-input>
                 <span>%</span>
 
                 <el-button v-if="index==0" type="primary" @click="addCategory" size="medium">添加</el-button>
-                <el-button v-else type="primary" @click="deleteCategory(key)" size="medium">删除</el-button>
+                <el-button v-else type="primary" @click="deleteCategory(index)" size="medium">删除</el-button>
               </el-form-item>
             </el-col>
           </el-row>
@@ -141,7 +141,7 @@ import PhotoAlbum from '@/components/PhotoAlbum'
 import { getSubway } from '@/api/city'
 import { getCategory } from '@/api/goods'
 import { addShop, getCompanyAll } from '@/api/company/shop'
-import { getShopPic } from '@/api/picManage'
+import { getBasePic } from '@/api/picManage'
 import { validateMPhone } from '@/utils/validate'
 export default {
   name: 'shopAdd',
@@ -187,6 +187,23 @@ export default {
         phone1: '',
         phone2: ''
       },
+      companyRules: {
+        companyId: [
+          { required: true, message: '请选择企业', trigger: 'change' }
+        ],
+        shopname: [
+          { required: true, message: '请输入门店名称', trigger: 'blur' }
+        ],
+        shopType: [
+          { required: true, message: '请选择门店分类', trigger: 'change' }
+        ],
+        phone1: [
+          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
+        ],
+        phone2: [
+          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
+        ]
+      },
       pcatFirstValue: '',
       // 门店分类
       shopTypeList: [
@@ -206,28 +223,12 @@ export default {
       },
       subwayList: [],
       companysList: [],
-      // 图片库
       businessCircle: [],
+      // 图片库
       isPhotosDialog: false,
       isCloseStatus: false,
       picList: [],
-      companyRules: {
-        companyId: [
-          { required: true, message: '请选择企业', trigger: 'change' }
-        ],
-        shopname: [
-          { required: true, message: '请输入门店名称', trigger: 'blur' }
-        ],
-        shopType: [
-          { required: true, message: '请选择门店分类', trigger: 'change' }
-        ],
-        phone1: [
-          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
-        ],
-        phone2: [
-          { validator: validateAllCall, message: '联系电话格式不正确', trigger: 'blur' }
-        ]
-      }
+      picType: 6 // 门店
 
     }
   },
@@ -333,7 +334,7 @@ export default {
     // 加载图片库
     getPicList() {
       this.listLoading = true
-      getShopPic().then(response => {
+      getBasePic(this.picType).then(response => {
         var data = response.data
         this.picList = data.reverse()
         this.listLoading = false

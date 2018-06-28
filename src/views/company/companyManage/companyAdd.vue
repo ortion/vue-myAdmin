@@ -57,7 +57,7 @@
           <el-input v-model.trim="companyForm.chargePhone" placeholder="请输入负责人电话"></el-input>
         </el-form-item>
         <p class="content-title" prop="account"><span style="color:red">*</span>财务信息</p>
-        <el-tabs v-model.trim="accountInfo" type="card" class="accountInfo">
+        <el-tabs v-model="accountInfo" type="card" class="accountInfo">
           <el-tab-pane label="银行卡" name="first">
             <div class="tabs-content">
               <el-form-item label="开户行">

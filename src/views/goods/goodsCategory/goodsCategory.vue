@@ -38,7 +38,7 @@
       </el-pagination>
     </div>
     <!-- 点击增加弹出层 -->
-    <el-dialog :title="textMap[dialogStatus]" @close="isClose" :visible.sync="isShowDialog" :show-close="false" center>
+    <el-dialog :title="textMap[dialogStatus]" @close="isClose" :visible.sync="isShowDialog" :show-close="false">
       <el-form v-if="dialogStatus=='create'" :model="categoryForm" ref="categoryForm" :rules="categoryRules" label-width="80px">
         <el-form-item label="一级类目" prop="pcat">
           <el-select v-model="categoryForm.pcat" placeholder="一级类目">
@@ -65,6 +65,8 @@
             <el-table ref="multipleTable" :data="shopData" @select="handleSelection" style="width: 100%;margin-top:10px;" max-height="180" border @selection-change="handleSelectionChange">
               <el-table-column type="selection" width="55">
               </el-table-column>
+              <el-table-column prop="id" label="门店名称">
+              </el-table-column>
               <el-table-column prop="name" label="门店名称">
               </el-table-column>
               <el-table-column prop="type" label="门店类别">
@@ -73,7 +75,7 @@
                 <template slot-scope="scope">
                   <el-form v-if="scope.row.isSelect" class="checkRate" :model="scope.row" :rules="checkRate" ref="scope.row">
                     <el-form-item prop="rate">
-                      <el-input v-model.number="scope.row.rate" style="width:80px"></el-input>
+                      <el-input type="number" v-model.number="scope.row.rate" :min="0" :max="100" style="width:80px"></el-input>
                       <span>%</span>
                     </el-form-item>
                   </el-form>
@@ -198,20 +200,27 @@ export default {
   },
   methods: {
     deleteType(row) {
-      this.$confirm('是否确定删除类目:' + row.catName, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        deleteGoodsCate(row.pcat, row.cat).then(res => {
-          this.getTypeList()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
+      if (row.shopNum === 0) {
+        this.$confirm('是否确定删除类目:' + row.catName, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          deleteGoodsCate(row.pcat, row.cat).then(res => {
+            this.getTypeList()
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            })
           })
+        }).catch(() => {
         })
-      }).catch(() => {
-      })
+      } else {
+        this.$message({
+          message: '存在可用门店，不能删除该类目',
+          type: 'error'
+        })
+      }
     },
     // 增加一级分类
     addFirstType() {
@@ -240,6 +249,7 @@ export default {
         if (valid) {
           this.loading = true
           UpdateGoodsCate(this.updateForm).then(response => {
+            this.getTypeList()
             this.$message({
               type: 'success',
               message: '修改成功!'
@@ -281,6 +291,7 @@ export default {
           })
           this.loading = true
           addSecondCate(this.categoryForm).then(response => {
+            this.getTypeList()
             this.$message({
               type: 'success',
               message: '保存成功!'
@@ -310,21 +321,29 @@ export default {
     },
     // 筛选
     getQueryShops() {
-      // if (this.queryShops.shopId || this.queryShops.shopName) {
-      this.queryShops.pcat = this.categoryForm.pcat
-      getValidShops(this.queryShops).then(response => {
-        if (response.data) {
-          const items = response.data
-          this.shopData = items.map(v => {
-            this.$set(v, 'rate', '')
-            this.$set(v, 'isSelect', false)
-            return v
-          })
-        } else {
-          this.shopData = []
-        }
-        this.openShopData = true
-      })
+      if (this.queryShops.shopId || this.queryShops.shopName) {
+        // if (this.dialogStatus === 'update') {
+        //   this.queryShops.pcat = this.categoryForm.pcat
+        // }
+        getValidShops(this.queryShops).then(response => {
+          if (response.data) {
+            const items = response.data
+            this.shopData = items.map(v => {
+              this.$set(v, 'rate', '')
+              this.$set(v, 'isSelect', false)
+              return v
+            })
+          } else {
+            this.shopData = []
+          }
+          this.openShopData = true
+        })
+      } else {
+        this.$message({
+          message: '门店编号、门店名称至少写一个',
+          type: 'error'
+        })
+      }
     },
     // 获得一级分类
     getGoodsCategory() {
@@ -357,11 +376,10 @@ export default {
       })
     },
     isClose() {
-      if (this.dialogStatus === 'created') {
+      if (this.dialogStatus === 'create') {
         if (this.$refs.categoryForm !== undefined) {
           this.$refs.categoryForm.resetFields()
         }
-
         this.categoryForm = {
           pcat: '',
           catName: '',
@@ -371,7 +389,6 @@ export default {
         if (this.$refs.updateForm !== undefined) {
           this.$refs.updateForm.resetFields()
         }
-
         this.updateForm = {
           pcat: '',
           cat: '',
@@ -379,7 +396,12 @@ export default {
           shopIds: []
         }
       }
-
+      this.queryShops = {
+        pcat: '',
+        cat: '',
+        shopId: '',
+        shopName: ''
+      }
       this.openShopData = false
       this.dialogStatus = ''
     }
