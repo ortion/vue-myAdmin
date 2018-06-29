@@ -40,6 +40,14 @@ import { client } from '@/utils/alioss'
 export default {
   props: ['photoType', 'photoList', 'closeDialog', 'multipleStatus'],
   watch: {
+    photoList() {
+      if (this.multipleStatus) {
+        this.photoList.forEach(item => {
+          this.$set(item, 'isSelect', false)
+        })
+        console.log(this.photoList)
+      }
+    },
     closeDialog(val) {
       if (val) {
         this.checkedImg = []
@@ -50,11 +58,7 @@ export default {
     }
   },
   created() {
-    if (this.multipleStatus) {
-      this.photoList.forEach(item => {
-        this.$set(item, 'isSelect', false)
-      })
-    }
+    console.log(this.photoList)
   },
   data() {
     return {
@@ -102,6 +106,8 @@ export default {
         fileName = 'icon' + file.file.uid
       } else if (this.photoType === 'shop') {
         fileName = 'shop' + file.file.uid
+      } else if (this.photoType === 'goods') {
+        fileName = 'goods' + file.file.uid
       }
       this.loading = true
       this.listLoading = true

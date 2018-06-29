@@ -100,6 +100,17 @@ export const constantRouterMap = [
       component: () => import('@/views/goods/goodsManage/goodsAdd'),
       meta: { title: '新建商品' }
     }]
+  },
+  {
+    path: '/goods',
+    component: Layout,
+    hidden: true,
+    children: [{
+      path: 'goodsManage/goodsDetail',
+      name: 'goodsDetail',
+      component: () => import('@/views/goods/goodsManage/goodsDetail'),
+      meta: { title: '商品详情' }
+    }]
   }
 
 ]

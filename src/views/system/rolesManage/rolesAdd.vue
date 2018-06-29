@@ -88,6 +88,7 @@ export default {
       })
     },
     onSave() {
+      console.log(this.roleForm.checkedID.length)
       if (this.roleForm.roleName && this.roleForm.merchant && (this.roleForm.checkedID.length > 0)) {
         this.loading = true
         addRoles(this.roleForm).then(

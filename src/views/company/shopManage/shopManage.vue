@@ -83,8 +83,7 @@
       </el-table-column>
       <el-table-column label="门店状态" align="center">
         <template slot-scope="scope">
-          <div v-if="scope.row.status==1">可用</div>
-          <div v-if="scope.row.status==2">关店</div>
+          {{getStatus(scope.row.status)}}
         </template>
       </el-table-column>
       <el-table-column prop="whyStop" label="操作原因" align="center">
@@ -146,6 +145,16 @@ export default {
     this.getShopList()
   },
   methods: {
+    // 状态
+    getStatus(id) {
+      let name
+      this.shopStatus.map(item => {
+        if (item.id === id) {
+          name = item.name
+        }
+      })
+      return name
+    },
     delShop(row) {
       this.$confirm('是否确定删除' + row.name, '提示', {
         confirmButtonText: '确定',

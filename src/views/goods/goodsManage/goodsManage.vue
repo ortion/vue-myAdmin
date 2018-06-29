@@ -62,46 +62,52 @@
       </el-card>
     </div>
     <div style="text-align:right;margin-bottom:10px;">
-      <el-button type="primary" size="small">批量上架</el-button>
-      <el-button type="primary" size="small">批量下架</el-button>
+      <el-button :disabled="this.multipleSelection.length==0" type="primary" size="small" @click="switchGoods('on')">批量上架</el-button>
+      <el-button :disabled="this.multipleSelection.length==0" type="primary" size="small" @click="switchGoods('off')">批量下架</el-button>
     </div>
-    <el-table :data="goodsList" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
-      <el-table-column align="center" label='序号'>
+    <el-table @selection-change="selectionGoods" :data="goodsList" v-loading.body="listLoading" element-loading-text="Loading" border fit highlight-current-row>
+      <el-table-column align="center" label='序号' width="55">
         <template slot-scope="scope">
           {{scope.$index+1}}
         </template>
       </el-table-column>
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column prop="id" label="图标" align="center">
-      </el-table-column>
-      <el-table-column prop="name" label="商品编码" align="center">
-      </el-table-column>
-      <el-table-column prop="adr" label="名称" align="center">
-      </el-table-column>
-      <el-table-column prop="charge" label="规格" align="center">
-      </el-table-column>
-      <el-table-column prop="chargePhone" label="单价" align="center">
-      </el-table-column>
-      <el-table-column prop="chargePhone" label="分类" align="center">
-      </el-table-column>
-      <el-table-column prop="chargePhone" label="创建时间" align="center">
-      </el-table-column>
-      <el-table-column label="企业状态" align="center">
+      <el-table-column label="图标" align="center" width="80">>
         <template slot-scope="scope">
-          <div v-if="scope.row.status==1">可用</div>
-          <div v-if="scope.row.status==2">停用</div>
+          <img :src="scope.row.masterPicUrl" alt="" v-if="scope.row.masterPicUrl">
+          <img :src="logo" alt="" v-else>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="操作" width="280px">
+      <el-table-column label="商品编码" align="center" width="300">
+        <template slot-scope="scope">
+          <router-link :to="{name: 'goodsDetail', query: {id: scope.row.goodsNo}}">
+            <el-button type="text">{{scope.row.goodsNo}}</el-button>
+          </router-link>
+        </template>
+      </el-table-column>
+      <el-table-column prop="name" label="名称" align="center">
+      </el-table-column>
+      <el-table-column prop="price" label="单价" align="center">
+      </el-table-column>
+      <el-table-column prop="cat" label="分类" align="center">
+      </el-table-column>
+      <el-table-column prop="creatDate" label="创建时间" align="center">
+      </el-table-column>
+      <el-table-column label="状态" align="center">
+        <template slot-scope="scope">
+          {{getStatus(scope.row.status)}}
+        </template>
+      </el-table-column>
+      <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <div style="text-align:left">
 
-            <el-button v-if="scope.row.status==1" @click="switchCompany(scope.row)" size="mini" type="primary" plain>下架</el-button>
-            <el-button v-if="scope.row.status==5||scope.row.status==2" @click="switchCompany(scope.row)" size="mini" type="warning" plain>上架</el-button>
-            <el-button v-if="scope.row.status==3||scope.row.status==6" @click="switchCompany(scope.row)" size="mini" type="success" plain>提交审核</el-button>
-            <el-button v-if="scope.row.status==4" @click="switchCompany(scope.row)" size="mini" type="success" plain>提醒审核</el-button>
-            <el-button v-if="scope.row.status==5||scope.row.status==2" @click="switchCompany(scope.row)" size="mini" type="danger" plain>删除</el-button>
+            <el-button v-if="scope.row.status==1" @click="switchGoods('off',scope.row.goodsNo)" size="mini" type="primary" plain>下架</el-button>
+            <el-button v-if="scope.row.status==5||scope.row.status==2" @click="switchGoods('on',scope.row.goodsNo)" size="mini" type="warning" plain>上架</el-button>
+            <el-button v-if="scope.row.status==3||scope.row.status==6" @click="reviewGood(scope.row)" size="mini" type="success" plain>提交审核</el-button>
+            <el-button v-if="scope.row.status==4" size="mini" type="success" plain>提醒审核</el-button>
+            <el-button v-loading="loading" v-if="scope.row.status==5||scope.row.status==2" @click="deleteGood(scope.row)" size="mini" type="danger" plain>删除</el-button>
           </div>
         </template>
       </el-table-column>
@@ -115,12 +121,14 @@
   </div>
 </template>
 <script>
-import { getGoodsList } from '@/api/goods'
-import { statusCompany } from '@/api/company/company'
+import logo from '@/assets/logo.png'
+import { getGoodsList, onGoods, offGoods, submitReviewGoods, deleteGoods } from '@/api/goods'
 export default {
   name: 'goodsManage',
   data() {
     return {
+      logo,
+      loading: false,
       goodsList: [],
       query: {
         curPage: 1,
@@ -157,35 +165,80 @@ export default {
         {
           id: 6,
           name: '审核未通过'
+        },
+        {
+          id: 7,
+          name: '已停用'
         }
-      ]
+      ],
+      multipleSelection: []
     }
   },
   created() {
     this.getGoodList()
   },
   methods: {
-    switchCompany(row, val) {
-      let str = ''
-      if (val === 'on') {
-        str = '开启'
-      } else if (val === 'off') {
-        str = '停用'
+    deleteGood(row) {
+      this.loading = true
+      deleteGoods(row.goodsNo).then(res => {
+        this.getGoodList()
+        this.$message({
+          type: 'success',
+          message: '删除成功'
+        })
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
+    },
+    reviewGood(row) {
+      submitReviewGoods(row.goodsNo).then(res => {
+        this.getCompanyList()
+        this.$message({
+          type: 'success',
+          message: '审核已提交'
+        })
+      })
+    },
+    // 状态
+    getStatus(id) {
+      let name
+      this.goodsStatus.map(item => {
+        if (item.id === id) {
+          name = item.name
+        }
+      })
+      return name
+    },
+    selectionGoods(val) {
+      this.multipleSelection = val
+    },
+    switchGoods(status, id) {
+      const selectList = []
+      if (id) {
+        selectList.push(id)
+      } else {
+        this.multipleSelection.forEach(items => {
+          selectList.push(items.goodsNo)
+        })
       }
-      this.$confirm('是否' + str + row.name, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        statusCompany(row.id).then(res => {
-          this.getCompanyList()
+      if (status === 'on') {
+        onGoods(selectList).then(res => {
+          this.getGoodList()
           this.$message({
             type: 'success',
-            message: row.name + '已' + str
+            message: ' 上架成功'
           })
         })
-      }).catch(() => {
-      })
+      } else if (status === 'off') {
+        offGoods(selectList).then(res => {
+          this.getGoodList()
+          this.$message({
+            type: 'success',
+            message: '下架成功'
+          })
+        })
+      }
     },
     clearFilter() {
       this.query = {
@@ -211,7 +264,7 @@ export default {
       this.listLoading = true
       getGoodsList(this.query).then(response => {
         if (response.data) {
-          this.goodsList = response.data.companies
+          this.goodsList = response.data.data
           this.totelCount = response.data.tolCount
           this.query.pageSize = response.data.pageSize
           this.query.curPage = response.data.curPage

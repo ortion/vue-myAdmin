@@ -210,18 +210,18 @@ export default {
       handler(newValue, oldValue) {
         this.$refs.priceForm.validate(valid => {
           if (valid) {
-            if (this.sendName.name === 'A') {
-              this.fromA = this.priceForm
-              this.$emit('priceMessage', { value: this.fromA, id: 'A' })
-            } else if (this.sendName.name === 'B') {
-              this.fromB = this.priceForm
-              this.$emit('priceMessage', { value: this.fromB, id: 'B' })
-            } else if (this.sendName.name === 'C') {
-              this.fromC = this.priceForm
-              this.$emit('priceMessage', { value: this.fromC, id: 'C' })
-            } else if (this.sendName.name === 'D') {
-              this.fromD = this.priceForm
-              this.$emit('priceMessage', { value: this.fromD, id: 'D' })
+            if (this.sendName === 'A') {
+              this.fromA = newValue
+              this.$emit('priceMessage', { value: this.fromA, name: this.sendName })
+            } else if (this.sendName === 'B') {
+              this.fromB = newValue
+              this.$emit('priceMessage', { value: this.fromB, name: this.sendName })
+            } else if (this.sendName === 'C') {
+              this.fromC = newValue
+              this.$emit('priceMessage', { value: this.fromC, name: this.sendName })
+            } else if (this.sendName === 'D') {
+              this.fromD = newValue
+              this.$emit('priceMessage', { value: this.fromD, name: this.sendName })
             }
           } else {
             console.log('error submit!!')

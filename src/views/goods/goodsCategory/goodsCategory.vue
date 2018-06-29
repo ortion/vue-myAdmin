@@ -402,6 +402,7 @@ export default {
         shopId: '',
         shopName: ''
       }
+      this.shopData = []
       this.openShopData = false
       this.dialogStatus = ''
     }

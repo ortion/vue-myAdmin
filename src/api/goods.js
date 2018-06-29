@@ -104,6 +104,16 @@ export function getGoodsList(query) {
     data
   })
 }
+export function getGoodsDetail(id) {
+  return request({
+    url: 'goods/detail',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNo': id
+    }
+  })
+}
 export function addGoods(data) {
   return request({
     url: 'goods/add',
@@ -114,9 +124,98 @@ export function addGoods(data) {
       'pcat': data.pcat,
       'cat': data.cat,
       'masterPicUrl': data.masterPicUrl,
-      'pics': data.picUrl,
+      'pics': data.pics,
       'introduction': data.introduction,
       'skus': data.skus
+    }
+  })
+}
+// 状态切换
+export function onGoods(list) {
+  return request({
+    url: 'goods/onshelf',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNos': list
+    }
+  })
+}
+export function offGoods(list) {
+  return request({
+    url: 'goods/offshelf',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNos': list
+    }
+  })
+}
+export function submitReviewGoods(id) {
+  return request({
+    url: 'goods/submitaudit',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'no': id
+    }
+  })
+}
+export function deleteGoods(id) {
+  return request({
+    url: 'goods/delete',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNo': id
+    }
+  })
+}
+// 商品审核
+
+export function getGoodsRList(query) {
+  var data = {
+    'token': getToken()
+  }
+  for (const key in query) {
+    if (query[key] !== '') {
+      Vue.set(data, key, query[key])
+    }
+  }
+  return request({
+    url: 'goods/auditlist',
+    method: 'POST',
+    data
+  })
+}
+
+export function stopGoods(id) {
+  return request({
+    url: 'goods/stop',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNos': id
+    }
+  })
+}
+export function openGoods(id) {
+  return request({
+    url: 'goods/open',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNo': id
+    }
+  })
+}
+export function reviewGoods(id) {
+  return request({
+    url: 'goods/audit',
+    method: 'POST',
+    data: {
+      'token': getToken(),
+      'goodsNos': id
     }
   })
 }

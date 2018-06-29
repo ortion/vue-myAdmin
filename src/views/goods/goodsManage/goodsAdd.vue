@@ -30,21 +30,21 @@
         </el-tabs>
       </el-form-item>
       <el-form-item label="商品缩略图片">
-        <div class="inlint goodsPic">
+        <div class="inlint thumbnail">
           <img :src="goodsForm.masterPicUrl" alt="" v-if="goodsForm.masterPicUrl">
           <img :src="logo" alt="" v-else>
         </div>
         <div class="inlint">
-          <div class="inlint">
-            <el-button type="primary" @click="openPhotos" size="medium">选择</el-button>
-          </div>
+          <el-button type="primary" @click="openPhotos" size="medium">选择</el-button>
         </div>
       </el-form-item>
       <el-form-item label="商品描述">
-        <div class="inlint goodsPic">
-          <img :src="logo" alt="" v-if="goodsForm.pics.length===0">
-          <div v-else v-for="(item,index) in goodsForm.pics" :key="index">
-            <i class="el-icon-remove"></i>
+        <div class="inlint goodsPicList">
+          <div class="goodsPic" v-if="goodsForm.pics.length===0">
+            <img :src="logo" alt="">
+          </div>
+          <div class="goodsPic inlint" v-else v-for="(item,index) in goodsForm.pics" :key="index">
+            <i class="el-icon-remove" @click="removePics(item)"></i>
             <img :src="item" alt="">
           </div>
         </div>
@@ -52,7 +52,7 @@
           <el-button type="primary" @click="openPhotos('mul')" size="medium">选择</el-button>
         </div>
         <div style="margin-top:15px;">
-          <el-input type="textarea":autosize="{ minRows: 4, maxRows: 8}" placeholder="请输入商品描述" v-model="goodsForm.introduction">
+          <el-input type="textarea" :autosize="{ minRows: 4, maxRows: 8}" placeholder="请输入商品描述" v-model="goodsForm.introduction">
           </el-input>
         </div>
       </el-form-item>
@@ -69,7 +69,7 @@
 
 <script>
 import logo from '@/assets/logo.png'
-import { getCategory } from '@/api/goods'
+import { getCategory, addGoods } from '@/api/goods'
 import { getBasePic } from '@/api/picManage'
 import goodsPrice from './components/goodsPrice'
 import PhotoAlbum from '@/components/PhotoAlbum'
@@ -109,23 +109,22 @@ export default {
       // 商品定价
       goodsPriceValue: 'A',
       goodsPriceTabs: [{
-        title: 'A级美容师',
         name: 'A',
+        title: 'A级美容师',
         form: {}
       }, {
-        title: 'B级美容师',
         name: 'B',
+        title: 'B级美容师',
         form: {}
       }, {
-        title: 'C级美容师',
         name: 'C',
+        title: 'C级美容师',
         form: {}
       }, {
-        title: '无美容师',
         name: 'D',
+        title: '无美容师',
         form: {}
       }],
-      beautician: false,
       // 图片库
       isPhotosDialog: false,
       isCloseStatus: false,
@@ -147,22 +146,17 @@ export default {
               this.goodsForm.skus.push(item.form)
             }
           })
-          console.log(this.goodsForm)
-          // this.loading = true
-          // addShop(this.goodsForm).then(response => {
-          //   this.$message({
-          //     type: 'success',
-          //     message: '保存成功!'
-          //   })
-          //   this.loading = false
-          //   if (this.companyStatus) {
-          //     this.$router.push({ name: 'companyManage' })
-          //   } else {
-          //     this.$router.push({ name: 'shopManage' })
-          //   }
-          // }).catch(() => {
-          //   this.loading = false
-          // })
+          this.loading = true
+          addGoods(this.goodsForm).then(response => {
+            this.$message({
+              type: 'success',
+              message: '保存成功!'
+            })
+            this.loading = false
+            this.$router.push({ name: 'goodsManage' })
+          }).catch(() => {
+            this.loading = false
+          })
         } else {
           console.log('error submit!!')
           return false
@@ -170,19 +164,25 @@ export default {
       })
     },
     // 图片
+    removePics(name) {
+      this.goodsForm.pics.splice(name, 1)
+    },
     openPhotos(str) {
-      this.isPhotosDialog = true
       if (str === 'mul') {
         this.isMultiple = true
       } else {
         this.isMultiple = false
       }
+      this.isPhotosDialog = true
+
       this.getPicList()
     },
     selectImg(url) {
       this.isPhotosDialog = false
       if (Array.isArray(url)) {
-        this.goodsForm.pics = url
+        url.forEach(item => {
+          this.goodsForm.pics.push(item)
+        })
       } else {
         this.goodsForm.masterPicUrl = url
       }
@@ -203,16 +203,15 @@ export default {
     },
     // 定价
     goodsPriceList(data) {
-      this.isEmpty(data.value)
-      if (this.beautician) {
+      if (this.isEmpty(data.value)) {
         this.goodsPriceTabs.map(item => {
-          if (data.id === item.name) {
+          if (data.name === item.name) {
             item.form = data.value
           }
         })
       } else {
         this.goodsPriceTabs.map(item => {
-          if (data.id === item.name) {
+          if (data.name === item.name) {
             item.form = {}
           }
         })
@@ -220,13 +219,12 @@ export default {
     },
     // 看是否为空
     isEmpty(val) {
-      this.beautician = false
-      for (const key in val) {
+      for (var key in val) {
         if (val[key] !== '' && val[key] !== 0) {
-          this.beautician = true
-          return
+          return true
         }
       }
+      return false
     },
     // 商品类目
     getGoodsCategory(id) {
@@ -254,10 +252,16 @@ export default {
 .goodsForm {
   width: 750px;
 }
-
+.thumbnail {
+  width: 150px;
+  height: 150px;
+  vertical-align: bottom;
+}
 .goodsPic {
   width: 150px;
   height: 150px;
+}
+.goodsPicList {
   vertical-align: bottom;
 }
 </style>
