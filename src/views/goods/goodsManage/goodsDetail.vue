@@ -33,9 +33,9 @@
         <p>{{goodsdetail.orderMax}}</p>
       </li>
     </ul>
-    <div style="text-align:left" v-if="this.status=='review'" >
-      <el-button @click="rewiewGood('off',scope.row.goodsNo)" type="primary" plain>审核通过</el-button>
-      <el-button @click="rewiewGood('on',scope.row.goodsNo)" type="warning" plain>审核不通过</el-button>
+    <div style="text-align:left" v-if="this.status=='review'">
+      <el-button :loading="loading"  @click="rewiewGood(6)" type="primary" plain>审核通过</el-button>
+      <el-button :loading="loading"  @click="rewiewGood(5)" type="warning" plain>审核不通过</el-button>
     </div>
   </div>
 
@@ -43,12 +43,13 @@
 
 <script>
 import logo from '@/assets/logo.png'
-import { getGoodsDetail } from '@/api/goods'
+import { getGoodsDetail, reviewGoods } from '@/api/goods'
 export default {
   name: 'goodsDetail',
   data() {
     return {
       logo,
+      loading: false,
       id: this.$route.query.id,
       status: this.$route.query.status,
       goodsdetail: Object
@@ -58,8 +59,18 @@ export default {
     this.goodsDetail()
   },
   methods: {
-    rewiewGood(id) {
-
+    rewiewGood(statues) {
+      this.loading = true
+      reviewGoods(this.id, statues).then(response => {
+        this.$message({
+          type: 'success',
+          message: '已审核!'
+        })
+        this.loading = false
+        this.$router.push({ name: 'goodsReview' })
+      }).catch(() => {
+        this.loading = false
+      })
     },
     goodsDetail() {
       this.listLoading = true

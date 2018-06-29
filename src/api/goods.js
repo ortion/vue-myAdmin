@@ -209,13 +209,14 @@ export function openGoods(id) {
     }
   })
 }
-export function reviewGoods(id) {
+export function reviewGoods(id, status) {
   return request({
     url: 'goods/audit',
     method: 'POST',
     data: {
       'token': getToken(),
-      'goodsNos': id
+      'goodsNos': id,
+      'auditStatus': status
     }
   })
 }

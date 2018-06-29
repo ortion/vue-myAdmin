@@ -39,7 +39,7 @@
             </el-col>
             <el-col :span="12">
               <label>单价：</label>
-              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入单价" v-model="query.price">
+              <el-input v-model.number="query.price" @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入单价">
               </el-input>
             </el-col>
           </el-row>
@@ -107,7 +107,7 @@
             <el-button v-if="scope.row.status==5||scope.row.status==2" @click="switchGoods('on',scope.row.goodsNo)" size="mini" type="warning" plain>上架</el-button>
             <el-button v-if="scope.row.status==3||scope.row.status==6" @click="reviewGood(scope.row)" size="mini" type="success" plain>提交审核</el-button>
             <el-button v-if="scope.row.status==4" size="mini" type="success" plain>提醒审核</el-button>
-            <el-button v-loading="loading" v-if="scope.row.status==5||scope.row.status==2" @click="deleteGood(scope.row)" size="mini" type="danger" plain>删除</el-button>
+            <el-button :loading="loading" v-if="scope.row.status==5||scope.row.status==2" @click="deleteGood(scope.row)" size="mini" type="danger" plain>删除</el-button>
           </div>
         </template>
       </el-table-column>
@@ -193,7 +193,7 @@ export default {
     },
     reviewGood(row) {
       submitReviewGoods(row.goodsNo).then(res => {
-        this.getCompanyList()
+        this.getGoodList()
         this.$message({
           type: 'success',
           message: '审核已提交'

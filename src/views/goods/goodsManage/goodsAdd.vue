@@ -57,7 +57,7 @@
         </div>
       </el-form-item>
       <el-form-item>
-        <el-button v-loading="loading" type="primary" @click="onSave">保存</el-button>
+        <el-button :loading="loading" type="primary" @click="onSave">保存</el-button>
       </el-form-item>
     </el-form>
     <!-- 图片库 -->

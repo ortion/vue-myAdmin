@@ -32,7 +32,7 @@
             </el-col>
             <el-col :span="12">
               <label>单价：</label>
-              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入单价" v-model="query.price">
+              <el-input @keyup.enter.native="handleFilter" style="width:70%" placeholder="请输入单价" v-model.number="query.price">
               </el-input>
             </el-col>
           </el-row>
@@ -66,7 +66,7 @@
           <img :src="logo" alt="" v-else>
         </template>
       </el-table-column>
-      <el-table-column label="商品编码" align="center">
+      <el-table-column label="商品编码" align="center" width="300">
         <template slot-scope="scope">
           <router-link :to="{name: 'goodsDetail', query: {id: scope.row.goodsNo}}">
             <el-button type="text">{{scope.row.goodsNo}}</el-button>
@@ -109,7 +109,7 @@
 </template>
 <script>
 import logo from '@/assets/logo.png'
-import { getGoodsList, stopGoods, openGoods, offGoods } from '@/api/goods'
+import { getGoodsRList, stopGoods, openGoods, offGoods } from '@/api/goods'
 export default {
   name: 'goodsReview',
   data() {
@@ -232,9 +232,9 @@ export default {
     },
     getGoodList() {
       this.listLoading = true
-      getGoodsList(this.query).then(response => {
+      getGoodsRList(this.query).then(response => {
         if (response.data) {
-          this.goodsList = response.data.rows
+          this.goodsList = response.data.data
           this.totelCount = response.data.tolCount
           this.query.pageSize = response.data.pageSize
           this.query.curPage = response.data.curPage
